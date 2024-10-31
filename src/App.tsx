@@ -5,10 +5,10 @@ import PublicRoutes from './layouts/PublicRoutes'
 import ExamList from './pages/ExamList'
 import MainLayout from './layouts/MainLayout'
 import ExamDetail from './pages/ExamDetail'
-import StudentInfo from './pages/StudentInfo'
-import TestStartPage from './pages/StartTest'
 import QuizForm from './pages/QuizForm'
 import CreateExam from './pages/CreateExam'
+import TestGeneralInfo from './pages/TestGeneralInfo'
+import JoinForm from './pages/JoinForm'
 
 function App() {
   return (
@@ -23,8 +23,8 @@ function App() {
             </Route>
           </Route>
           <Route path='/login' element={<Login />} />
-          <Route path='/join' element={<StudentInfo />} />
-          <Route path='/start' element={<TestStartPage />} />
+          <Route path='/join' element={<JoinForm />} />
+          <Route path='/start' element={<TestGeneralInfo />} />
           <Route path='/make-test' element={<QuizForm />} />
         </Routes>
       </div>
