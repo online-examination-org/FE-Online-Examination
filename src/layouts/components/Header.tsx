@@ -11,13 +11,16 @@ import {
   DropdownMenuItem
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import { Link } from 'react-router-dom'
 
 function Header() {
   return (
     <div className='fixed top-0 left-0 right-0 h-[56px] border-b z-50 bg-white'>
       <div className='lg:w-[1128px] w-full h-full lg:px-0 px-[24px] mx-auto flex items-center justify-between'>
         <div className='flex gap-[24px] items-center'>
-          <Logo />
+          <Link to='/'>
+            <Logo />
+          </Link>
           <Input
             type='text'
             id='search'
@@ -26,7 +29,9 @@ function Header() {
           />
         </div>
         <div className='flex items-center gap-[24px]'>
-          <Button>Create</Button>
+          <Button>
+            <Link to='/create-exam'>Create</Link>
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Avatar className='cursor-pointer'>
