@@ -469,7 +469,11 @@ const CreateExam = () => {
                       <Button
                         type='button'
                         onClick={() => {
-                          setQuizConfig(quizConfigDisplay)
+                          setQuizConfig({
+                            ...quizConfigDisplay,
+                            title: quizConfigDisplay.title.trim(),
+                            description: quizConfigDisplay.description.trim()
+                          })
                         }}
                       >
                         Save changes
