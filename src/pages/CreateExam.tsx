@@ -164,18 +164,18 @@ const CreateExam = () => {
   const [quizConfig, setQuizConfig] = useState({
     title: 'Quiz 01',
     passcode: '',
-    startTime: new Date(),
-    endTime: new Date(),
-    duration: 60,
+    startTime: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
+    endTime: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
+    duration: 30,
     description: 'This is quiz description'
   })
 
   const [quizConfigDisplay, setQuizConfigDisplay] = useState({
     title: 'Quiz 01',
     passcode: '',
-    startTime: new Date(),
-    endTime: new Date(),
-    duration: 60,
+    startTime: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
+    endTime: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
+    duration: 30,
     description: 'This is quiz description'
   })
 
@@ -420,7 +420,18 @@ const CreateExam = () => {
                       <Label htmlFor='end' className='text-right'>
                         End Time
                       </Label>
-                      <Input id='end' type='datetime-local' className='col-span-3' />
+                      <Input
+                        id='end'
+                        type='datetime-local'
+                        className='col-span-3'
+                        value={quizConfigDisplay.endTime.toISOString().slice(0, 16)}
+                        onChange={(e) =>
+                          setQuizConfigDisplay({
+                            ...quizConfigDisplay,
+                            endTime: new Date(e.target.value)
+                          })
+                        }
+                      />
                     </div>
 
                     <div className='grid grid-cols-4 items-center gap-4'>
