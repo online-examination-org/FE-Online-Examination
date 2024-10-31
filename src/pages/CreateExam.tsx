@@ -15,6 +15,16 @@ import {
   verticalListSortingStrategy
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
 
 const SortableQuestion = ({ question, originalQuestion, questionErrors, questionNumber, ...props }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: question.id })
@@ -150,6 +160,24 @@ const CreateExam = () => {
     shortAnswer: '',
     isEditing: true
   }
+
+  const [quizConfig, setQuizConfig] = useState({
+    title: 'Quiz 01',
+    passcode: '',
+    startTime: new Date(),
+    endTime: new Date(),
+    duration: 60,
+    description: 'This is quiz description'
+  })
+
+  const [quizConfigDisplay, setQuizConfigDisplay] = useState({
+    title: 'Quiz 01',
+    passcode: '',
+    startTime: new Date(),
+    endTime: new Date(),
+    duration: 60,
+    description: 'This is quiz description'
+  })
 
   const [questions, setQuestions] = useState([])
   const [editingStates, setEditingStates] = useState({})
@@ -324,9 +352,121 @@ const CreateExam = () => {
           <CardHeader>
             <div className='flex justify-between items-center'>
               <div>
-                <CardTitle className='text-3xl'>Quiz 01</CardTitle>
-                <CardDescription className='mt-2'>This is quiz description</CardDescription>
+                <CardTitle className='text-3xl'>{quizConfig.title}</CardTitle>
+                <CardDescription className='mt-2'>{quizConfig.description}</CardDescription>
               </div>
+
+              <Dialog
+                onOpenChange={(e) => {
+                  if (e) {
+                    setQuizConfigDisplay(quizConfig)
+                  }
+                }}
+              >
+                <DialogTrigger asChild>
+                  <Button variant='outline' size='icon'>
+                    <Pencil className='h-4 w-4' />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className='sm:max-w-[425px]'>
+                  <DialogHeader>
+                    <DialogTitle>Quiz Configuration</DialogTitle>
+                  </DialogHeader>
+                  <div className='grid gap-4 py-4'>
+                    <div className='grid grid-cols-4 items-center gap-4'>
+                      <Label htmlFor='title' className='text-right'>
+                        Title
+                      </Label>
+                      <Input
+                        id='title'
+                        className='col-span-3'
+                        value={quizConfigDisplay.title}
+                        onChange={(e) => setQuizConfigDisplay({ ...quizConfigDisplay, title: e.target.value })}
+                      />
+                    </div>
+
+                    <div className='grid grid-cols-4 items-center gap-4'>
+                      <Label htmlFor='passcode' className='text-right'>
+                        Passcode
+                      </Label>
+                      <Input
+                        id='passcode'
+                        type='password'
+                        className='col-span-3'
+                        value={quizConfigDisplay.passcode}
+                        onChange={(e) => setQuizConfigDisplay({ ...quizConfigDisplay, passcode: e.target.value })}
+                      />
+                    </div>
+
+                    <div className='grid grid-cols-4 items-center gap-4'>
+                      <Label htmlFor='start' className='text-right'>
+                        Start Time
+                      </Label>
+                      <Input
+                        id='start'
+                        type='datetime-local'
+                        className='col-span-3'
+                        value={quizConfigDisplay.startTime.toISOString().slice(0, 16)}
+                        onChange={(e) =>
+                          setQuizConfigDisplay({
+                            ...quizConfigDisplay,
+                            startTime: new Date(e.target.value)
+                          })
+                        }
+                      />
+                    </div>
+
+                    <div className='grid grid-cols-4 items-center gap-4'>
+                      <Label htmlFor='end' className='text-right'>
+                        End Time
+                      </Label>
+                      <Input id='end' type='datetime-local' className='col-span-3' />
+                    </div>
+
+                    <div className='grid grid-cols-4 items-center gap-4'>
+                      <Label htmlFor='duration' className='text-right'>
+                        Duration (minutes)
+                      </Label>
+                      <Input
+                        id='duration'
+                        type='number'
+                        className='col-span-3'
+                        value={quizConfigDisplay.duration}
+                        onChange={(e) => {
+                          setQuizConfigDisplay({
+                            ...quizConfigDisplay,
+                            duration: parseInt(e.target.value)
+                          })
+                        }}
+                      />
+                    </div>
+
+                    <div className='grid grid-cols-4 items-center gap-4'>
+                      <Label htmlFor='description' className='text-right'>
+                        Description
+                      </Label>
+                      <Textarea
+                        id='description'
+                        className='col-span-3'
+                        value={quizConfigDisplay.description}
+                        onChange={(e) => setQuizConfigDisplay({ ...quizConfigDisplay, description: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button
+                        type='button'
+                        onClick={() => {
+                          setQuizConfig(quizConfigDisplay)
+                        }}
+                      >
+                        Save changes
+                      </Button>
+                    </DialogClose>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           </CardHeader>
         </Card>
