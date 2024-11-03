@@ -25,12 +25,10 @@ export default function Login() {
       const response = await login(data)
       console.log(response)
       localStorage.setItem('access_token', response.data.access_token)
-      localStorage.setItem('role', response.data.role)
       navigate('/')
     } catch (err) {
       console.log(err)
       localStorage.removeItem('access_token')
-      localStorage.removeItem('role')
     }
   }
 
