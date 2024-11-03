@@ -4,10 +4,10 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { CheckCircle2, XCircle, AlertCircle, Award } from 'lucide-react'
-import quizResDetail from '@/dummy_datas/quizResDetail'
+import quizAnsData from '../../dummy_datas/quiz_ans_data.json'
 
-const ExamResultDetail = () => {
-  const { quiz, totalScore, passingScore } = quizResDetail
+const StudentQuizResult = () => {
+  const { quiz, totalScore, passingScore } = quizAnsData
   const questions = quiz.questions
 
   const getAnswerStatus = (question: any, option: string) => {
@@ -56,23 +56,16 @@ const ExamResultDetail = () => {
                     <Badge variant={question.type === 'multipleChoice' ? 'default' : 'secondary'}>
                       {question.type === 'multipleChoice' ? 'Multiple Choice' : 'Short Answer'}
                     </Badge>
-                    {question.required && (
-                      <Badge variant='destructive' className='text-xs'>
-                        Required
-                      </Badge>
-                    )}
                   </div>
                   <h3 className='text-lg font-medium text-gray-800'>
                     Question {question.id + 1}: {question.question}
                   </h3>
                 </div>
-                {/* Score indicator for the question */}
                 <Badge variant={question.isCorrect ? 'default' : 'destructive'} className='ml-4'>
                   {question.score || 0}/{question.maxScore || 1} points
                 </Badge>
               </div>
 
-              {/* Answer Section */}
               <div className='mt-4 pl-4'>
                 {question.type === 'multipleChoice' ? (
                   <RadioGroup value={question.correctAnswer} className='space-y-3'>
@@ -123,7 +116,6 @@ const ExamResultDetail = () => {
                   </div>
                 )}
 
-                {/* Feedback Section */}
                 {question.feedback && (
                   <div className='mt-4 p-4 rounded-lg bg-blue-50 border border-blue-200'>
                     <p className='text-sm text-blue-600 mb-1'>Feedback:</p>
@@ -139,4 +131,4 @@ const ExamResultDetail = () => {
   )
 }
 
-export default ExamResultDetail
+export default StudentQuizResult

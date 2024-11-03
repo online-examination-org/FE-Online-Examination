@@ -346,7 +346,7 @@ const CreateExam = () => {
   }
 
   return (
-    <div className='h-[80vh]'>
+    <div className='h-[80vh] px-2'>
       <div className='container items-start justify-center mx-auto w-full'>
         <Card className='w-full'>
           <CardHeader>
