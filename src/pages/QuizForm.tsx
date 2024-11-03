@@ -8,7 +8,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import quizData from '../dummy_datas/quizData'
 import { ChevronLeft, ChevronRight, Send, Clock, Save, LayoutGrid, List } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
-import { spawn } from 'child_process'
 
 // Type definitions
 export interface Question {
@@ -130,8 +129,6 @@ const QuizForm = ({ quiz = defaultQuiz, onSubmit }: QuizForm2Props) => {
   // Event handlers
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleAnswer = (value: string, question_id: any = null): void => {
-    if (!question_id) return
-
     setAnswers((prev) => ({
       ...prev,
       [question_id]: value
@@ -279,7 +276,7 @@ const QuizForm = ({ quiz = defaultQuiz, onSubmit }: QuizForm2Props) => {
                       {questions[currentQuestionIndex].options?.map((option) => (
                         <div key={option} className='flex items-center space-x-2'>
                           <RadioGroupItem value={option} id={option} />
-                          <Label htmlFor={option} className='font-normal'>
+                          <Label htmlFor={option} className='font-normal cursor-pointer'>
                             {option}
                           </Label>
                         </div>
@@ -316,7 +313,7 @@ const QuizForm = ({ quiz = defaultQuiz, onSubmit }: QuizForm2Props) => {
                           {question.options?.map((option) => (
                             <div key={option} className='flex items-center space-x-2'>
                               <RadioGroupItem value={option} id={option} />
-                              <Label htmlFor={option} className='font-normal'>
+                              <Label htmlFor={option} className='font-normal cursor-pointer'>
                                 {option}
                               </Label>
                             </div>
@@ -328,7 +325,6 @@ const QuizForm = ({ quiz = defaultQuiz, onSubmit }: QuizForm2Props) => {
                           placeholder='Enter your answer'
                           value={answers[question.id] || ''}
                           onChange={(e) => {
-                            console.log(question.id)
                             handleAnswer(e.target.value, question.id)
                           }}
                         />
