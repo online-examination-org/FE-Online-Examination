@@ -24,9 +24,9 @@ const StudentQuizResult = () => {
   }
 
   return (
-    <div className='max-w-4xl mx-auto p-6'>
+    <div className='w-[1140px] mx-auto p-6'>
       {/* Quiz Header */}
-      <Card className='mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-none'>
+      <Card className='mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 bor  der-none'>
         <CardContent className='pt-6'>
           <div className='flex justify-between items-center mb-4'>
             <div>
