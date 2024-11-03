@@ -9,6 +9,7 @@ import QuizForm from './pages/QuizForm'
 import TestGeneralInfo from './pages/TestGeneralInfo'
 import JoinForm from './pages/JoinForm'
 import ExamResuiltDetail from './pages/ExamResuiltDetail'
+import { TeacherRoutes } from './layouts/PrivateRoutes'
 
 function App() {
   return (
@@ -16,13 +17,16 @@ function App() {
       <div className='App'>
         <Routes>
           <Route element={<MainLayout />}>
-            <Route element={<PublicRoutes />}>
+            <Route element={<TeacherRoutes />}>
               <Route path='/' element={<ExamList />} />
               <Route path='/exam/:id' element={<ExamDetail />} />
               <Route path='/exam/:id/student/:id' element={<ExamResuiltDetail />} />
             </Route>
           </Route>
-          <Route path='/login' element={<Login />} />
+          <Route element={<PublicRoutes />}>
+            <Route path='/login' element={<Login />} />
+          </Route>
+
           <Route path='/join' element={<JoinForm />} />
           <Route path='/start' element={<TestGeneralInfo />} />
           <Route path='/make-test' element={<QuizForm />} />
