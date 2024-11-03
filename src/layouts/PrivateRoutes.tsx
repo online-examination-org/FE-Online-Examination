@@ -1,13 +1,25 @@
 import { Navigate, Outlet } from 'react-router-dom'
+import { jwtDecode } from 'jwt-decode'
+
+interface DecodedToken {
+  email: string
+  exp: number
+  iat: number
+  id: number
+  name: string
+  role: string
+}
 
 export const TeacherRoutes = () => {
   const token = localStorage.getItem('access_token')
-  const role = localStorage.getItem('role')
-  return token && role === 'teacher' ? <Outlet /> : <Navigate to='/login' />
+  if (!token) return <Navigate to='/login' />
+  const decoded = jwtDecode<DecodedToken>(token)
+  return decoded.role === 'teacher' ? <Outlet /> : <Navigate to='/login' />
 }
 
 export const StudentRoutes = () => {
   const token = localStorage.getItem('access_token')
-  const role = localStorage.getItem('role')
-  return token && role === 'student' ? <Outlet /> : <Navigate to='/join' />
+  if (!token) return <Navigate to='/join' />
+  const decoded = jwtDecode<DecodedToken>(token)
+  return decoded.role === 'student' ? <Outlet /> : <Navigate to='*' />
 }
