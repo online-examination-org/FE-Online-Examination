@@ -3,10 +3,12 @@ import { useParams } from 'react-router-dom'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import CreateExam from './components/CreateExam'
 import StudentRecordTable from './components/StudentRecordTable'
+import { useSelector } from 'react-redux'
 
 const QuizBoard: React.FC = () => {
+  const user = useSelector((state: any) => state.user)
   const { id } = useParams()
-  console.log(id)
+  console.log(id, user)
 
   return (
     <div className='bg-primary-foreground h-[calc(100vh-56px)] overflow-hidden'>
