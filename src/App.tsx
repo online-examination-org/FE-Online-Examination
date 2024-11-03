@@ -10,6 +10,7 @@ import MainLayout from './layouts/MainLayout'
 import QuizLanding from './pages/teacher/QuizLanding/QuizLanding'
 import QuizBoard from './pages/teacher/QuizBoard/QuizBoard'
 import { StudentRoutes, TeacherRoutes } from './layouts/PrivateRoutes'
+import { Toaster } from '@/components/ui/toaster'
 
 function App() {
   return (
@@ -32,7 +33,13 @@ function App() {
             <Route path='/start' element={<StartQuiz />} />
             <Route path='/make-quiz' element={<MakeQuiz />} />
           </Route>
+
+          <Route
+            path='*'
+            element={<div className='h-[100vh] w-[100vw] flex items-center justify-center'>404 not found</div>}
+          />
         </Routes>
+        <Toaster />
       </div>
     </Router>
   )
