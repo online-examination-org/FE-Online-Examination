@@ -346,8 +346,8 @@ const CreateExam = () => {
   }
 
   return (
-    <div className='min-h-[calc(100vh-56px)]'>
-      <div className='container items-start justify-center mx-auto p-6 max-w-3xl'>
+    <div className='h-[80vh]'>
+      <div className='container items-start justify-center mx-auto w-full'>
         <Card className='w-full'>
           <CardHeader>
             <div className='flex justify-between items-center'>
@@ -487,7 +487,7 @@ const CreateExam = () => {
         </Card>
       </div>
 
-      <div className='container flex flex-col gap-4 items-start justify-center mx-auto p-6 max-w-3xl'>
+      <div className='container flex flex-col gap-4 items-start justify-center mx-auto w-full overflow-y-scroll h-[70vh] mt-10'>
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={questions.map((q) => q.id)} strategy={verticalListSortingStrategy}>
             {questions.map((originalQuestion, index) => {

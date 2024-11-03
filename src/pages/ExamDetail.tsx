@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
+import CreateExam from './CreateExam'
 const ExamDetail: React.FC = () => {
   const { id } = useParams()
   console.log(id)
@@ -14,12 +15,13 @@ const ExamDetail: React.FC = () => {
           <h2 className='text-2xl font-bold'>Quiz 1 - Software engineering (CO3005)</h2>
         </div>
         <Tabs defaultValue='question' className='w-full mx-auto mt-4'>
-          <TabsList className='grid w-full grid-cols-3'>
+          <TabsList className='grid w-full grid-cols-2'>
             <TabsTrigger value='question'>Questions</TabsTrigger>
             <TabsTrigger value='result'>Results</TabsTrigger>
-            <TabsTrigger value='settings'>Settings</TabsTrigger>
           </TabsList>
-          <TabsContent value='question'></TabsContent>
+          <TabsContent value='question'>
+            <CreateExam />
+          </TabsContent>
           <TabsContent value='result'>
             <Table>
               <TableHeader>
@@ -58,7 +60,6 @@ const ExamDetail: React.FC = () => {
               </TableBody>
             </Table>
           </TabsContent>
-          <TabsContent value='settings'></TabsContent>
         </Tabs>
       </div>
     </div>
