@@ -9,6 +9,7 @@ import StudentQuizResult from './pages/teacher/StudentQuizResult'
 import MainLayout from './layouts/MainLayout'
 import QuizLanding from './pages/teacher/QuizLanding/QuizLanding'
 import QuizBoard from './pages/teacher/QuizBoard/QuizBoard'
+import { TeacherRoutes } from './layouts/PrivateRoutes'
 
 function App() {
   return (
@@ -16,13 +17,16 @@ function App() {
       <div className='App'>
         <Routes>
           <Route element={<MainLayout />}>
-            <Route element={<PublicRoutes />}>
+            <Route element={<TeacherRoutes />}>
               <Route path='/' element={<QuizLanding />} />
               <Route path='/quiz/:id' element={<QuizBoard />} />
               <Route path='/quiz/:id/student/:id' element={<StudentQuizResult />} />
             </Route>
           </Route>
-          <Route path='/login' element={<Login />} />
+          <Route element={<PublicRoutes />}>
+            <Route path='/login' element={<Login />} />
+          </Route>
+
           <Route path='/join' element={<JoinQuiz />} />
           <Route path='/start' element={<StartQuiz />} />
           <Route path='/make-quiz' element={<MakeQuiz />} />
