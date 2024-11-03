@@ -5,11 +5,10 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import quizData from '../dummy_datas/quizData'
 import { ChevronLeft, ChevronRight, Send, Clock, Save, LayoutGrid, List } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
+import quizData from '../../dummy_datas/quiz_data.json'
 
-// Type definitions
 export interface Question {
   id: number
   question: string
@@ -18,7 +17,7 @@ export interface Question {
   required: boolean
 }
 
-export interface Quiz {
+export interface QuizProps {
   title: string
   description: string
   timeLimit: number
@@ -29,10 +28,10 @@ interface Answers {
   [key: number]: string
 }
 
-interface QuizForm2Props {
-  quiz?: Quiz
-  onSubmit?: (answers: Answers) => void
-}
+// interface MakeQuizProps {
+//   quiz?: QuizProps
+//   onSubmit?: (answers: Answers) => void
+// }
 
 interface SubmissionData {
   timestamp: string
@@ -41,38 +40,46 @@ interface SubmissionData {
   timeSpent: number
 }
 
-// Default quiz data
-const defaultQuiz: Quiz = {
-  title: 'Sample Quiz',
-  description: 'This is a sample quiz',
-  timeLimit: 30,
-  questions: [
-    {
-      id: 1,
-      question: 'What is your preferred JavaScript framework?',
-      type: 'multipleChoice',
-      options: ['React', 'Vue', 'Angular', 'Svelte'],
-      required: true
-    },
-    {
-      id: 2,
-      question: 'Explain what is Virtual DOM in React?',
-      type: 'shortQuestion',
-      required: true
-    }
-  ]
-}
+// // Default quiz data
+// const defaultQuiz: QuizProps = {
+//   title: 'Sample Quiz',
+//   description: 'This is a sample quiz',
+//   timeLimit: 30,
+//   questions: [
+//     {
+//       id: 1,
+//       question: 'What is your preferred JavaScript framework?',
+//       type: 'multipleChoice',
+//       options: ['React', 'Vue', 'Angular', 'Svelte'],
+//       required: true
+//     },
+//     {
+//       id: 2,
+//       question: 'Explain what is Virtual DOM in React?',
+//       type: 'shortQuestion',
+//       required: true
+//     }
+//   ]
+// }
 
-const QuizForm = ({ quiz = defaultQuiz, onSubmit }: QuizForm2Props) => {
+const MakeQuiz = () => {
   const questionRefs = useRef<(HTMLDivElement | null)[]>([])
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0)
   const [answers, setAnswers] = useState<Answers>({})
   const [timeRemaining, setTimeRemaining] = useState<number>(quizData.quiz.timeLimit * 60)
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  // const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [showAlert, setShowAlert] = useState<boolean>(false)
   const [alertMessage, setAlertMessage] = useState<string>('')
   const [viewMode, setViewMode] = useState<'card' | 'list'>('list')
+  const [exam, setExam] = useState<any>()
   const questions = quizData.quiz.questions
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      setExam(quizData.quiz)
+    }
+    fetchQuestions()
+  })
 
   // Timer effect
   useEffect(() => {
@@ -135,39 +142,15 @@ const QuizForm = ({ quiz = defaultQuiz, onSubmit }: QuizForm2Props) => {
     }))
   }
 
-  const handleSubmit = async (): void => {
-    setIsSubmitting(true)
-
-    const unansweredRequired = questions.filter((question) => question.required && !answers[question.id])
-
-    if (unansweredRequired.length > 0) {
-      showMessage(`Please answer all required questions. ${unansweredRequired.length} questions remaining.`)
-      setIsSubmitting(false)
-      return
-    }
-
+  const handleSubmit = async () => {
     const submissionData: SubmissionData = {
       timestamp: new Date().toISOString(),
-      quizTitle: quiz.title,
-      answers,
-      timeSpent: quiz.timeLimit * 60 - timeRemaining
+      quizTitle: exam.title,
+      timeSpent: exam.timeLimit * 60 - timeRemaining,
+      answers
     }
-
-    try {
-      if (onSubmit) {
-        await onSubmit(answers)
-      } else {
-        console.log('Submitting answers:', submissionData)
-        // Add your API call here
-      }
-
-      localStorage.removeItem('quizAnswers')
-      showMessage('Quiz submitted successfully!')
-    } catch (error) {
-      showMessage('Error submitting quiz. Please try again.')
-    } finally {
-      setIsSubmitting(false)
-    }
+    localStorage.removeItem('quizAnswers')
+    console.log('Submitting answers:', submissionData)
   }
 
   const handleNext = (): void => {
@@ -252,8 +235,8 @@ const QuizForm = ({ quiz = defaultQuiz, onSubmit }: QuizForm2Props) => {
           <CardHeader>
             <div className='flex justify-between items-center'>
               <div>
-                <CardTitle className='text-2xl'>{quiz.title}</CardTitle>
-                <CardDescription>{quiz.description}</CardDescription>
+                <CardTitle className='text-2xl'>{exam?.title}</CardTitle>
+                <CardDescription>{exam?.description}</CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -356,8 +339,12 @@ const QuizForm = ({ quiz = defaultQuiz, onSubmit }: QuizForm2Props) => {
                 Save Progress
               </Button>
 
-              <Button onClick={handleSubmit} disabled={calculateProgress() !== 100 || isSubmitting}>
+              {/* <Button onClick={handleSubmit} disabled={calculateProgress() !== 100 || isSubmitting}>
                 {isSubmitting ? 'Submitting...' : 'Submit'}
+                <Send className='w-4 h-4 ml-2' />
+              </Button> */}
+              <Button onClick={handleSubmit} disabled={calculateProgress() !== 100}>
+                Submit
                 <Send className='w-4 h-4 ml-2' />
               </Button>
             </div>
@@ -370,4 +357,4 @@ const QuizForm = ({ quiz = defaultQuiz, onSubmit }: QuizForm2Props) => {
   )
 }
 
-export default QuizForm
+export default MakeQuiz

@@ -11,7 +11,7 @@ interface TestInfo {
   duration: string
 }
 
-export default function TestGeneralInfo() {
+export default function StartQuiz() {
   const [testInfo, setTestInfo] = useState<TestInfo | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()

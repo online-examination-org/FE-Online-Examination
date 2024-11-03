@@ -26,7 +26,7 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
         <CardDescription>{exam.name}</CardDescription>
       </CardHeader>
       <CardFooter>
-        <Link to={`/exam/${exam._id}`} className='w-full'>
+        <Link to={`/quiz/${exam._id}`} className='w-full'>
           <Button className='w-full'>View detail</Button>
         </Link>
       </CardFooter>

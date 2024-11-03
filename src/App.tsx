@@ -1,14 +1,14 @@
 import './App.css'
-import Login from '@/pages/Login'
+import Login from '@/pages/teacher/Login'
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 import PublicRoutes from './layouts/PublicRoutes'
-import ExamList from './pages/ExamList'
+import MakeQuiz from './pages/student/MakeQuiz'
+import StartQuiz from './pages/student/StartQuiz'
+import JoinQuiz from './pages/student/JoinQuiz'
+import StudentQuizResult from './pages/teacher/StudentQuizResult'
 import MainLayout from './layouts/MainLayout'
-import ExamDetail from './pages/ExamDetail'
-import QuizForm from './pages/QuizForm'
-import TestGeneralInfo from './pages/TestGeneralInfo'
-import JoinForm from './pages/JoinForm'
-import ExamResuiltDetail from './pages/ExamResuiltDetail'
+import QuizLanding from './pages/teacher/QuizLanding/QuizLanding'
+import QuizBoard from './pages/teacher/QuizBoard/QuizBoard'
 import { TeacherRoutes } from './layouts/PrivateRoutes'
 
 function App() {
@@ -18,18 +18,18 @@ function App() {
         <Routes>
           <Route element={<MainLayout />}>
             <Route element={<TeacherRoutes />}>
-              <Route path='/' element={<ExamList />} />
-              <Route path='/exam/:id' element={<ExamDetail />} />
-              <Route path='/exam/:id/student/:id' element={<ExamResuiltDetail />} />
+              <Route path='/' element={<QuizLanding />} />
+              <Route path='/quiz/:id' element={<QuizBoard />} />
+              <Route path='/quiz/:id/student/:id' element={<StudentQuizResult />} />
             </Route>
           </Route>
           <Route element={<PublicRoutes />}>
             <Route path='/login' element={<Login />} />
           </Route>
 
-          <Route path='/join' element={<JoinForm />} />
-          <Route path='/start' element={<TestGeneralInfo />} />
-          <Route path='/make-test' element={<QuizForm />} />
+          <Route path='/join' element={<JoinQuiz />} />
+          <Route path='/start' element={<StartQuiz />} />
+          <Route path='/make-quiz' element={<MakeQuiz />} />
         </Routes>
       </div>
     </Router>
