@@ -1,6 +1,6 @@
 import React from 'react'
 import { useForm } from 'react-hook-form'
-import ExamCard from '@/components/common/ExamCard'
+import ExamCard from '@/pages/teacher/QuizLanding/components/ExamCard'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { PlusIcon } from '@radix-ui/react-icons'
@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useState } from 'react'
 
-function ExamList() {
+function QuizLanding() {
   const [open, setOpen] = useState(false)
 
   const {
@@ -225,4 +225,4 @@ function ExamList() {
   )
 }
 
-export default ExamList
+export default QuizLanding
