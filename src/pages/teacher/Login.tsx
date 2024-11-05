@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { Loader2 } from 'lucide-react'
+import PillInput from '@/components/ui/input-custom'
 
 // Define the form schema with Yup
 const loginSchema = yup
@@ -68,47 +69,45 @@ export default function Login() {
           <CardDescription>Enter your email and password to login to your account</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmitLogin)} className='space-y-4'>
-            <div className='space-y-2'>
-              <Label htmlFor='email'>Email</Label>
-              <Input
+          <form onSubmit={handleSubmit(onSubmitLogin)} className='space-y-5'>
+            <div className='flex flex-col w-full gap-6'>
+              <PillInput
+                label='Email'
                 id='email'
                 type='email'
-                placeholder='m@example.com'
-                {...register('email')}
-                className={`${errors.email ? 'border-red-500' : ''} transition-colors`}
+                placeholder='yourmail@example.com'
+                register={register('email')}
+                error={errors.email?.message}
                 disabled={isSubmitting}
               />
-              {errors.email && <p className='text-sm text-red-500'>{errors.email.message}</p>}
-            </div>
-            <div className='space-y-2'>
-              <Label htmlFor='password'>Password</Label>
-              <Input
+
+              <PillInput
+                label='Password'
                 id='password'
                 type='password'
-                {...register('password')}
-                className={`${errors.password ? 'border-red-500' : ''} transition-colors`}
+                placeholder='yourmail@example.com'
+                register={register('password')}
+                error={errors.password?.message}
                 disabled={isSubmitting}
               />
-              {errors.password && <p className='text-sm text-red-500'>{errors.password.message}</p>}
-            </div>
 
-            {loginError && (
-              <div className='mb-4 text-red-400 text-[14px] pt-1 h-[30px] border border-red-400 rounded-lg flex items-center justify-center'>
-                {loginError}
+              {loginError && (
+                <div className='mb-4 text-red-400 text-[14px] pt-1 h-[30px] border border-red-400 rounded-lg flex items-center justify-center'>
+                  {loginError}
+                </div>
+              )}
+              <div className='w-full'>
+                <Button type='submit' className='w-full mt-5 min-h-[45px]' disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                      Logging in...
+                    </>
+                  ) : (
+                    'Login'
+                  )}
+                </Button>
               </div>
-            )}
-            <div className='w-full'>
-              <Button type='submit' className='w-full mt-5' disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                    Logging in...
-                  </>
-                ) : (
-                  'Login'
-                )}
-              </Button>
             </div>
           </form>
         </CardContent>

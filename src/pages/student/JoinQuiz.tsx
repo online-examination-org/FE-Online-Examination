@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { useNavigate } from 'react-router-dom'
+import PillInput from '@/components/ui/input-custom'
 
 const schema = yup
   .object({
@@ -70,55 +71,47 @@ export default function JoinQuiz() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-              <div className='space-y-2'>
-                <Label htmlFor='passcode'>Passcode</Label>
-                <Input
+              <div className='flex flex-col w-full gap-6'>
+                <PillInput
+                  label='Email'
                   id='passcode'
-                  type='password'
-                  {...register('passcode')}
+                  type='passcode'
                   placeholder='Enter your passcode'
-                  className={errors.passcode ? 'border-red-500' : ''}
+                  register={register('passcode')}
+                  error={errors.passcode?.message}
+                  disabled={isSubmitting}
                 />
-                {errors.passcode && <p className='text-sm text-red-500 mt-1'>{errors.passcode.message}</p>}
-              </div>
-
-              <div className='space-y-2'>
-                <Label htmlFor='studentId'>Student ID</Label>
-                <Input
+                <PillInput
+                  label='Student ID'
                   id='studentId'
-                  {...register('studentId')}
-                  placeholder='Enter your student ID'
-                  className={errors.studentId ? 'border-red-500' : ''}
+                  type='studentId'
+                  placeholder='Enter your StudentId'
+                  register={register('studentId')}
+                  error={errors.studentId?.message}
+                  disabled={isSubmitting}
                 />
-                {errors.studentId && <p className='text-sm text-red-500 mt-1'>{errors.studentId.message}</p>}
-              </div>
-
-              <div className='space-y-2'>
-                <Label htmlFor='fullName'>Full Name</Label>
-                <Input
+                <PillInput
+                  label='Full Name'
                   id='fullName'
-                  {...register('fullName')}
-                  placeholder='Enter your full name'
-                  className={errors.fullName ? 'border-red-500' : ''}
+                  type='fullName'
+                  placeholder='Enter your fullName'
+                  register={register('fullName')}
+                  error={errors.fullName?.message}
+                  disabled={isSubmitting}
                 />
-                {errors.fullName && <p className='text-sm text-red-500 mt-1'>{errors.fullName.message}</p>}
-              </div>
-
-              <div className='space-y-2'>
-                <Label htmlFor='email'>Student Email</Label>
-                <Input
+                <PillInput
+                  label='Student Email'
                   id='email'
                   type='email'
-                  {...register('email')}
                   placeholder='Enter your email'
-                  className={errors.email ? 'border-red-500' : ''}
+                  register={register('email')}
+                  error={errors.email?.message}
+                  disabled={isSubmitting}
                 />
-                {errors.email && <p className='text-sm text-red-500 mt-1'>{errors.email.message}</p>}
+                <Button className='w-full font-semibold min-h-[45px]' type='submit' disabled={isSubmitting}>
+                  {isSubmitting ? 'Submitting...' : 'Submit'}
+                </Button>{' '}
               </div>
-
-              <Button className='w-full font-semibold' type='submit' disabled={isSubmitting}>
-                {isSubmitting ? 'Submitting...' : 'Submit'}
-              </Button>
             </form>
           </CardContent>
         </div>
