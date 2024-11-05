@@ -25,6 +25,7 @@ import {
   DialogTrigger
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 const SortableQuestion = ({ question, originalQuestion, questionErrors, questionNumber, ...props }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: question.id })
@@ -487,7 +488,7 @@ const CreateExam = () => {
         </Card>
       </div>
 
-      <div className='container flex flex-col gap-4 items-start justify-center mx-auto w-full overflow-y-scroll h-[70vh] mt-10'>
+      <ScrollArea className='container flex flex-col gap-4 items-start justify-center mx-auto w-full h-[70vh] mt-10'>
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={questions.map((q) => q.id)} strategy={verticalListSortingStrategy}>
             {questions.map((originalQuestion, index) => {
@@ -521,7 +522,7 @@ const CreateExam = () => {
             Create exam
           </Button>
         </div>
-      </div>
+      </ScrollArea>
     </div>
   )
 }
