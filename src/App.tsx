@@ -25,12 +25,10 @@ function App() {
               <Route path='/quiz/:id/student/:id' element={<StudentQuizResult />} />
             </Route>
           </Route>
+
           <Route element={<PublicRoutes />}>
             <Route path='/login' element={<Login />} />
             <Route path='/join' element={<JoinQuiz />} />
-            <Route path='/start' element={<StartQuiz />} />
-            <Route path='/make-quiz' element={<MakeQuiz />} />
-            <Route path='/completed' element={<TestCompletion />} />
           </Route>
 
           <Route element={<StudentRoutes />}>

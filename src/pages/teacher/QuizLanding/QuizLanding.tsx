@@ -95,7 +95,7 @@ function QuizLanding() {
     <div className='bg-primary-foreground h-[calc(100vh-56px)] overflow-hidden'>
       <div className='w-[1140px] mx-auto py-6 px-2'>
         <h2 className='text-2xl font-bold'>My examinations</h2>
-        <ScrollArea className='px-4 py-4 h-[calc(100vh-130px)]'>
+        <ScrollArea className='py-4 h-[calc(100vh-130px)]'>
           <div className='grid grid-cols-4 gap-4'>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
@@ -115,7 +115,7 @@ function QuizLanding() {
                   <DialogHeader>
                     <DialogTitle>Create a new exam</DialogTitle>
                   </DialogHeader>
-                  <div className='grid gap-4 py-4'>
+                  <div className='grid gap-4 py-4 p-3'>
                     <div className='grid grid-cols-4 items-center gap-4'>
                       <Label htmlFor='title' className='text-right'>
                         Title
