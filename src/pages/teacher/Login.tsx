@@ -85,7 +85,6 @@ export default function Login() {
                 label='Password'
                 id='password'
                 type='password'
-                placeholder='yourmail@example.com'
                 register={register('password')}
                 error={errors.password?.message}
                 disabled={isSubmitting}
