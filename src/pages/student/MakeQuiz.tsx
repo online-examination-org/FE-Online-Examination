@@ -5,10 +5,20 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { ChevronLeft, ChevronRight, Send, Clock, Save, LayoutGrid, List } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Send, Clock, LayoutGrid, List } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
 import quizData from '../../dummy_datas/quiz_data.json'
-
+import { useNavigate } from 'react-router-dom'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog'
 export interface Question {
   id: number
   question: string
@@ -40,28 +50,6 @@ interface SubmissionData {
   timeSpent: number
 }
 
-// // Default quiz data
-// const defaultQuiz: QuizProps = {
-//   title: 'Sample Quiz',
-//   description: 'This is a sample quiz',
-//   timeLimit: 30,
-//   questions: [
-//     {
-//       id: 1,
-//       question: 'What is your preferred JavaScript framework?',
-//       type: 'multipleChoice',
-//       options: ['React', 'Vue', 'Angular', 'Svelte'],
-//       required: true
-//     },
-//     {
-//       id: 2,
-//       question: 'Explain what is Virtual DOM in React?',
-//       type: 'shortQuestion',
-//       required: true
-//     }
-//   ]
-// }
-
 const MakeQuiz = () => {
   const questionRefs = useRef<(HTMLDivElement | null)[]>([])
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0)
@@ -71,7 +59,9 @@ const MakeQuiz = () => {
   const [showAlert, setShowAlert] = useState<boolean>(false)
   const [alertMessage, setAlertMessage] = useState<string>('')
   const [viewMode, setViewMode] = useState<'card' | 'list'>('list')
+  const [showSubmitDialog, setShowSubmitDialog] = useState(false)
   const [exam, setExam] = useState<any>()
+  const navigate = useNavigate()
   const questions = quizData.quiz.questions
 
   useEffect(() => {
@@ -127,11 +117,11 @@ const MakeQuiz = () => {
     handleSubmit()
   }
 
-  const showMessage = (message: string): void => {
-    setAlertMessage(message)
-    setShowAlert(true)
-    setTimeout(() => setShowAlert(false), 3000)
-  }
+  // const showMessage = (message: string): void => {
+  //   setAlertMessage(message)
+  //   setShowAlert(true)
+  //   setTimeout(() => setShowAlert(false), 3000)
+  // }
 
   // Event handlers
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -151,6 +141,7 @@ const MakeQuiz = () => {
     }
     localStorage.removeItem('quizAnswers')
     console.log('Submitting answers:', submissionData)
+    navigate('/completed')
   }
 
   const handleNext = (): void => {
@@ -213,9 +204,15 @@ const MakeQuiz = () => {
         ))}
       </div>
       {/* Quiz Timer */}
-      <div className='flex items-center gap-2 text-lg'>
-        <Clock className='w-5 h-5' />
-        <span className={`font-bold ${timeRemaining < 60 ? 'text-red-500' : ''}`}>{formatTime(timeRemaining)}</span>
+      <div className='flex items-center justify-between'>
+        <div className='flex items-center gap-2 text-lg'>
+          <Clock className='w-5 h-5' />
+          <span className={`font-bold ${timeRemaining < 60 ? 'text-red-500' : ''}`}>{formatTime(timeRemaining)}</span>
+        </div>
+        <Button onClick={() => setShowSubmitDialog(true)}>
+          Submit
+          <Send className='w-4 h-4 ml-2' />
+        </Button>
       </div>
     </div>
   )
@@ -254,10 +251,14 @@ const MakeQuiz = () => {
                     <RadioGroup
                       value={answers[currentQuestionIndex] || ''}
                       onValueChange={(value) => handleAnswer(value, currentQuestionIndex)}
-                      className='space-y-2'
+                      className='space-y-0'
                     >
                       {questions[currentQuestionIndex].options?.map((option) => (
-                        <div key={option} className='flex items-center space-x-2'>
+                        <div
+                          key={option}
+                          className='flex items-center space-x-2 hover:bg-gray-100 h-[30px] rounded-md'
+                          onClick={() => handleAnswer(option, currentQuestionIndex)}
+                        >
                           <RadioGroupItem value={option} id={option} />
                           <Label htmlFor={option} className='font-normal cursor-pointer'>
                             {option}
@@ -291,11 +292,19 @@ const MakeQuiz = () => {
                         <RadioGroup
                           value={answers[question.id] || ''}
                           onValueChange={(value) => handleAnswer(value, question.id)}
-                          className='space-y-2'
+                          className='space-y-0'
                         >
                           {question.options?.map((option) => (
-                            <div key={option} className='flex items-center space-x-2'>
-                              <RadioGroupItem value={option} id={option} />
+                            <div
+                              key={option}
+                              className='flex items-center space-x-2 hover:bg-gray-100 h-[30px] rounded-md'
+                              onClick={() => handleAnswer(option, question.id)}
+                            >
+                              <RadioGroupItem
+                                value={option}
+                                id={option}
+                                className={`${option === answers[question.id] ? 'bg-blue-400 text-white' : ''}`}
+                              />
                               <Label htmlFor={option} className='font-normal cursor-pointer'>
                                 {option}
                               </Label>
@@ -332,26 +341,39 @@ const MakeQuiz = () => {
                 </Button>
               </div>
             )}
-
-            <div className='flex gap-3 justify-end w-full'>
-              <Button variant='outline' onClick={() => showMessage('Progress saved!')}>
-                <Save className='w-4 h-4 mr-2' />
-                Save Progress
-              </Button>
-
-              {/* <Button onClick={handleSubmit} disabled={calculateProgress() !== 100 || isSubmitting}>
-                {isSubmitting ? 'Submitting...' : 'Submit'}
-                <Send className='w-4 h-4 ml-2' />
-              </Button> */}
-              <Button onClick={handleSubmit} disabled={calculateProgress() !== 100}>
-                Submit
-                <Send className='w-4 h-4 ml-2' />
-              </Button>
-            </div>
           </CardFooter>
         </Card>
 
         <QuizPanels />
+
+        <AlertDialog open={showSubmitDialog} onOpenChange={setShowSubmitDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Submit Quiz</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to submit your quiz?
+                <div className='mt-4'>
+                  <div className='text-sm'>
+                    <span className='font-bold pr-2'>Time remaining:</span> {formatTime(timeRemaining)}
+                  </div>
+                  <div className='text-sm mt-2'>
+                    <span className='font-bold pr-2'>Questions answered:</span> {Object.keys(answers).length} of{' '}
+                    {questions.length}
+                  </div>
+                  <div className='mt-4 text-sm text-muted-foreground'>
+                    Note: You cannot modify your answers after submission.
+                  </div>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleSubmit} className='bg-primary hover:bg-primary/90'>
+                Submit Quiz
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   )

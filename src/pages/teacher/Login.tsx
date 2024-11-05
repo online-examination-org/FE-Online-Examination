@@ -9,6 +9,7 @@ import { login } from '@/services/teachers.services'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
+import { Loader2 } from 'lucide-react'
 
 // Define the form schema with Yup
 const loginSchema = yup
@@ -75,7 +76,8 @@ export default function Login() {
                 type='email'
                 placeholder='m@example.com'
                 {...register('email')}
-                className={errors.email ? 'border-red-500' : ''}
+                className={`${errors.email ? 'border-red-500' : ''} transition-colors`}
+                disabled={isSubmitting}
               />
               {errors.email && <p className='text-sm text-red-500'>{errors.email.message}</p>}
             </div>
@@ -85,19 +87,29 @@ export default function Login() {
                 id='password'
                 type='password'
                 {...register('password')}
-                className={errors.password ? 'border-red-500' : ''}
+                className={`${errors.password ? 'border-red-500' : ''} transition-colors`}
+                disabled={isSubmitting}
               />
               {errors.password && <p className='text-sm text-red-500'>{errors.password.message}</p>}
             </div>
 
             {loginError && (
-              <div className='mb-4 text-red-400 text-[14px] pt-1 h-[30px] border border-red-400 rounded-lg flex item-center justify-center'>
+              <div className='mb-4 text-red-400 text-[14px] pt-1 h-[30px] border border-red-400 rounded-lg flex items-center justify-center'>
                 {loginError}
               </div>
             )}
-            <Button type='submit' className='w-full' disabled={isSubmitting}>
-              Login
-            </Button>
+            <div className='w-full'>
+              <Button type='submit' className='w-full mt-5' disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                    Logging in...
+                  </>
+                ) : (
+                  'Login'
+                )}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
