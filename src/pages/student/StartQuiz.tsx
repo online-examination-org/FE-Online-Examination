@@ -113,7 +113,7 @@ export default function StartQuiz() {
               className='w-full font-semibold'
               onClick={() => {
                 // Handle start test logic
-                navigate('/make-test')
+                navigate('/make-quiz')
                 console.log('Starting test...')
               }}
             >

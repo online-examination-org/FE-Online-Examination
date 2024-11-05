@@ -11,6 +11,7 @@ import QuizLanding from './pages/teacher/QuizLanding/QuizLanding'
 import QuizBoard from './pages/teacher/QuizBoard/QuizBoard'
 import { StudentRoutes, TeacherRoutes } from './layouts/PrivateRoutes'
 import { Toaster } from '@/components/ui/toaster'
+import TestCompletion from './pages/student/TestCompletion'
 
 function App() {
   return (
@@ -27,11 +28,15 @@ function App() {
           <Route element={<PublicRoutes />}>
             <Route path='/login' element={<Login />} />
             <Route path='/join' element={<JoinQuiz />} />
+            <Route path='/start' element={<StartQuiz />} />
+            <Route path='/make-quiz' element={<MakeQuiz />} />
+            <Route path='/completed' element={<TestCompletion />} />
           </Route>
 
           <Route element={<StudentRoutes />}>
             <Route path='/start' element={<StartQuiz />} />
             <Route path='/make-quiz' element={<MakeQuiz />} />
+            <Route path='/completed' element={<TestCompletion />} />
           </Route>
 
           <Route

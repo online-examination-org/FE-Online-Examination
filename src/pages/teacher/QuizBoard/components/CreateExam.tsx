@@ -347,7 +347,7 @@ const CreateExam = () => {
 
   return (
     <div className='h-[80vh] px-2'>
-      <div className='container items-start justify-center mx-auto w-full'>
+      <div className='container items-center justify-start mx-auto w-full'>
         <Card className='w-full'>
           <CardHeader>
             <div className='flex justify-between items-center'>

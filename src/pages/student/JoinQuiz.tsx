@@ -19,14 +19,7 @@ const schema = yup
       .min(2, 'Full name must be at least 2 characters')
       .max(50, 'Full name must not exceed 50 characters'),
     email: yup.string().required('Email is required').email('Must be a valid email'),
-    passcode: yup
-      .string()
-      .required('Passcode is required')
-      .min(6, 'Passcode must be at least 6 characters')
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-        'Passcode must contain at least one uppercase letter, one lowercase letter, and one number'
-      )
+    passcode: yup.string().required('Passcode is required')
   })
   .required()
 

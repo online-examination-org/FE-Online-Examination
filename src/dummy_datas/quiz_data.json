@@ -13,14 +13,16 @@
       },
       {
         "id": 1,
-        "question": "What is the primary purpose of Webpack in a project?",
-        "type": "shortQuestion",
+        "question": "Which of these are popular JavaScript testing frameworks?",
+        "type": "multipleChoice",
+        "options": ["Jest", "Mocha", "Jasmine", "Cypress", "Puppeteer"],
         "required": true
       },
       {
         "id": 2,
-        "question": "Explain what is Virtual DOM in React?",
-        "type": "shortQuestion",
+        "question": "What tool do you use for debugging JavaScript?",
+        "type": "multipleChoice",
+        "options": ["Chrome DevTools", "VSCode Debugger", "Firefox DevTools", "React Developer Tools", "None"],
         "required": true
       },
       {
@@ -65,35 +67,9 @@
       },
       {
         "id": 9,
-        "question": "Explain the purpose of useEffect in React.",
-        "type": "shortQuestion",
-        "required": true
-      },
-      {
-        "id": 10,
         "question": "Which HTTP methods do you use the most in RESTful APIs?",
         "type": "multipleChoice",
         "options": ["GET", "POST", "PUT", "DELETE", "PATCH"],
-        "required": true
-      },
-      {
-        "id": 11,
-        "question": "What tool do you use for debugging JavaScript?",
-        "type": "multipleChoice",
-        "options": ["Chrome DevTools", "VSCode Debugger", "Firefox DevTools", "React Developer Tools", "None"],
-        "required": true
-      },
-      {
-        "id": 12,
-        "question": "How would you handle errors in a React application?",
-        "type": "shortQuestion",
-        "required": true
-      },
-      {
-        "id": 13,
-        "question": "Which of these are popular JavaScript testing frameworks?",
-        "type": "multipleChoice",
-        "options": ["Jest", "Mocha", "Jasmine", "Cypress", "Puppeteer"],
         "required": true
       }
     ]
