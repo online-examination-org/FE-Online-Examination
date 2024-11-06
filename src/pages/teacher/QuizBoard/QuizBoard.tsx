@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import CreateExam from './components/CreateExam'
 import StudentRecordTable from './components/StudentRecordTable'
 import { useSelector } from 'react-redux'
+import ExamDetails from './components/ExamDetails'
 
 const QuizBoard: React.FC = () => {
   const user = useSelector((state: any) => state.user)
@@ -17,8 +18,11 @@ const QuizBoard: React.FC = () => {
           <DocumentIcon />
           <h2 className='text-2xl font-bold'>Quiz 1 - Software engineering (CO3005)</h2>
         </div>
-        <Tabs defaultValue='result' className='w-full mx-auto mt-4'>
-          <TabsList className='grid w-full grid-cols-2 h-[50px] mb-5 border'>
+        <Tabs defaultValue='general' className='w-full mx-auto mt-4'>
+          <TabsList className='grid w-full grid-cols-3 h-[50px] mb-5 border'>
+            <TabsTrigger value='general' className='h-[40px]'>
+              General
+            </TabsTrigger>
             <TabsTrigger value='result' className='h-[40px]'>
               Results
             </TabsTrigger>
@@ -27,6 +31,9 @@ const QuizBoard: React.FC = () => {
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value='general'>
+            <ExamDetails />
+          </TabsContent>
           <TabsContent value='result'>
             <StudentRecordTable />
           </TabsContent>
