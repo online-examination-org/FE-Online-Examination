@@ -1,4 +1,5 @@
 {
+  "homepage": "https://online-examination-org.github.io/FE-Online-Examination",
   "name": "online-examination-app",
   "private": true,
   "version": "0.0.0",
@@ -67,6 +68,7 @@
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.13",
+    "gh-pages": "^6.2.0",
     "globals": "^15.11.0",
     "postcss": "^8.4.47",
     "prettier": "^3.3.3",
