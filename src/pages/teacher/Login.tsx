@@ -66,7 +66,9 @@ export default function Login() {
       <Card className='w-full mx-4 max-w-sm'>
         <CardHeader className='space-y-1'>
           <CardTitle className='text-2xl font-bold'>Login</CardTitle>
-          <CardDescription>Enter your email and password to login to your account</CardDescription>
+          <CardDescription className='font-ligth'>
+            Enter your email and password to login to your account
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmitLogin)} className='space-y-5'>
@@ -75,7 +77,7 @@ export default function Login() {
                 label='Email'
                 id='email'
                 type='email'
-                placeholder='yourmail@example.com'
+                placeholder='Enter your email'
                 register={register('email')}
                 error={errors.email?.message}
                 disabled={isSubmitting}
@@ -85,7 +87,7 @@ export default function Login() {
                 label='Password'
                 id='password'
                 type='password'
-                placeholder='yourmail@example.com'
+                placeholder='Enter your password'
                 register={register('password')}
                 error={errors.password?.message}
                 disabled={isSubmitting}
@@ -96,8 +98,9 @@ export default function Login() {
                   {loginError}
                 </div>
               )}
+
               <div className='w-full'>
-                <Button type='submit' className='w-full mt-5 min-h-[45px]' disabled={isSubmitting}>
+                <Button type='submit' className='w-full min-h-[45px]' disabled={isSubmitting}>
                   {isSubmitting ? (
                     <>
                       <Loader2 className='mr-2 h-4 w-4 animate-spin' />

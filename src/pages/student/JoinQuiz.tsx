@@ -67,9 +67,9 @@ export default function JoinQuiz() {
         <div className='w-3/5'>
           <CardHeader className='space-y-1'>
             <CardTitle className='text-xl font-bold'>Student Information</CardTitle>
-            <CardDescription>Please enter your student information</CardDescription>
+            <CardDescription className='font-light'>Please enter your student information</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className='bg-white'>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
               <div className='flex flex-col w-full gap-6'>
                 <PillInput
