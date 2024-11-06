@@ -10,6 +10,9 @@ import {
   DropdownMenuItem
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import { getProfile } from '@/services/teachers.services'
+import { Profile } from '@/types/type'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 function Header() {
@@ -19,6 +22,22 @@ function Header() {
     localStorage.removeItem('role')
     navigate('/login')
   }
+
+  const [profile, setProfile] = useState<Profile | null>(null)
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await getProfile()
+        console.log(response.data)
+        setProfile(response.data)
+      } catch (err) {
+        console.error(err)
+        localStorage.removeItem('access_token')
+        navigate('/login')
+      }
+    }
+    fetchProfile()
+  }, [])
   return (
     <div className='fixed top-0 left-0 right-0 h-[56px] border-b z-50 bg-white'>
       <div className='lg:w-[1128px] w-full h-full lg:px-0 px-[24px] mx-auto flex items-center justify-between'>
@@ -42,7 +61,7 @@ function Header() {
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent className='w-56'>
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuLabel>{profile?.name || ''}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem className='gap-[8px] cursor-pointer'>

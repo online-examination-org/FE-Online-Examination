@@ -1,4 +1,4 @@
-import { LoginBody, RegisterBody } from '@/types/type'
+import { LoginBody, Profile, RegisterBody } from '@/types/type'
 import http from './http'
 
 const baseUrl = '/teachers'
@@ -9,4 +9,8 @@ export const login = (payload: LoginBody) => {
 
 export const register = (payload: RegisterBody) => {
   return http.post(`${baseUrl}/signup`, payload)
+}
+
+export const getProfile = () => {
+  return http.get<Profile>(`${baseUrl}/info`)
 }
