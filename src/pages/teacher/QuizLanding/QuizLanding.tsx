@@ -2,18 +2,9 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import ExamCard from '@/pages/teacher/QuizLanding/components/ExamCard'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { PlusIcon } from '@radix-ui/react-icons'
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -88,18 +79,38 @@ function QuizLanding() {
           <div className='grid grid-cols-4 gap-4 p-3'>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Card className='cursor-pointer'>
-                  <CardHeader>
-                    <Button variant='secondary' className='w-14 h-14 mx-auto'>
-                      <PlusIcon />
-                    </Button>
+                <Card className='relative overflow-hidden bg-white hover:shadow-lg transition-all duration-300 transform hover:scale-105 rounded-lg'>
+                  <div
+                    className='h-[82px] w-full bg-cover bg-center relative'
+                    style={{
+                      backgroundImage:
+                        "url('https://plus.unsplash.com/premium_photo-1678567671496-aa666d40af88?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+                      backgroundSize: 'cover',
+                      backgroundRepeat: 'no-repeat'
+                    }}
+                  >
+                    <div className='absolute inset-0 bg-gradient-to-b from-transparent to-gray-900 opacity-70'></div>
+                  </div>
+                  <CardHeader className='absolute top-14 left-0 right-0 p-3'>
+                    <CardTitle className='flex justify-center items-center'>
+                      <div className='bg-white w-full px-3 py-3 rounded shadow-md border border-gray-300 text-center truncate'>
+                        Create an examination
+                      </div>
+                    </CardTitle>
+
+                    <CardDescription>
+                      <div className='flex w-1/4 h-1/4 mx-auto overflow-hidden pt-5'>
+                        <img
+                          src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCfmyy5-Ewc_F7rubOKTMcl8gCxii3Cnk2UA&s'
+                          alt=''
+                          className='w-full h-full object-cover'
+                        />
+                      </div>
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <p className='text-center font-semibold'>Create a new test</p>
-                  </CardContent>
                 </Card>
               </DialogTrigger>
-              <DialogContent className='sm:max-w-[425px]'>
+              <DialogContent className='sm:max-w-[555px]'>
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <DialogHeader>
                     <DialogTitle>Create a new exam</DialogTitle>
@@ -204,6 +215,16 @@ function QuizLanding() {
                 </form>
               </DialogContent>
             </Dialog>
+            {exams.map((exam) => (
+              <ExamCard key={exam.exam_id} exam={exam} />
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+      <div className='w-[1140px] mx-auto py-6 px-2'>
+        <h2 className='text-2xl font-bold'>My examinations</h2>
+        <ScrollArea className='py-4 h-[calc(100vh-130px)]'>
+          <div className='grid grid-cols-4 gap-4 p-3'>
             {exams.map((exam) => (
               <ExamCard key={exam.exam_id} exam={exam} />
             ))}

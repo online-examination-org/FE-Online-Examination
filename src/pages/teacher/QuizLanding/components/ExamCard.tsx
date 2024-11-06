@@ -12,29 +12,31 @@ interface ExamCardProps {
 
 const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
   return (
-    <Card className='relative p-0 overflow-hidden bg-gray-100 hover:scale-105 hover:border-blue-200 rounded-lg'>
-      {/* Background Image */}
+    <Card className='relative overflow-hidden bg-white hover:shadow-lg transition-all duration-300 transform hover:scale-105 rounded-lg'>
+      {/* Background Image with Gradient Overlay */}
       <div
-        className='h-[82px] w-full bg-cover bg-center'
+        className='h-[82px] w-full bg-cover bg-center relative'
         style={{
           backgroundImage:
-            "url('https://plus.unsplash.com/premium_photo-1678567671496-aa666d40af88?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+            "url('https://cdn2.fptshop.com.vn/unsafe/Uploads/images/tin-tuc/172740/Originals/background-la-gi-1.jpg')",
           backgroundSize: 'cover',
-          backgroundRepeat: 'false'
+          backgroundRepeat: 'no-repeat'
         }}
-      />
+      >
+        <div className='absolute inset-0 bg-gradient-to-b from-transparent to-gray-900 opacity-70'></div>
+      </div>
 
       {/* Card Header */}
       <CardHeader className='absolute top-14 left-0 right-0 p-3'>
         <CardTitle className='flex justify-center items-center'>
-          <div className='bg-white w-full px-3 py-3 rounded-sm shadow-sm border border-gray-300 truncate'>
+          <div className='bg-white w-full px-3 py-3 rounded shadow-md border border-gray-300 text-center truncate'>
             {exam.title}
           </div>
         </CardTitle>
 
-        {/* Exam Name and Additional Information */}
+        {/* Exam Details */}
         <CardDescription>
-          <div className='text-sm text-black mt-2 px-3 flex flex-col gap-1'>
+          <div className='text-sm text-gray-800 mt-2 px-3 flex flex-col gap-1'>
             <p>
               <strong>Start:</strong> {formatDateTime(exam.start_time)}
             </p>
@@ -51,11 +53,17 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
       {/* Card Footer */}
       <CardFooter className='mt-32 px-3 w-full flex items-center justify-between'>
         <Link to={`/quiz/${exam.exam_id}`} className='w-4/5'>
-          <Button className='w-full'>View detail</Button>
+          <Button className='w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold transition-all duration-200'>
+            View detail
+          </Button>
         </Link>
-        <div className='w-1/5 cursor-pointer text-muted-foreground hover:text-primary bg-white rounded-sm flex items-center justify-center'>
-          <Trash className='text-black' />
-        </div>
+        <button
+          className='w-1/5 cursor-pointer text-muted-foreground hover:text-red-600 bg-white rounded-sm flex items-center justify-center transition-all duration-200'
+          aria-label='Delete Exam'
+          title='Delete Exam'
+        >
+          <Trash className='text-gray-500 hover:text-red-600' />
+        </button>
       </CardFooter>
     </Card>
   )

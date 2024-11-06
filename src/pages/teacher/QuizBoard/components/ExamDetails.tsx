@@ -43,7 +43,7 @@ const ExamDetails = () => {
   }
 
   // Tạo URL cho QR code (ví dụ: domain của bạn + exam_id)
-  const qrValue = `http://localhost:3000/join?passcode=${exam.exam_id}`
+  const qrValue = `http://localhost:3000/join?passcode=${exam.passcode}`
 
   // Format dates
   const formatDateTime = (isoString: string) => {
@@ -51,7 +51,7 @@ const ExamDetails = () => {
   }
 
   return (
-    <div className='w-full mx-auto  px-2 '>
+    <div className='w-full mx-auto px-2'>
       <Card className='rounded-md'>
         <CardHeader>
           <CardTitle className='text-2xl font-bold'>{exam.title}</CardTitle>
@@ -60,15 +60,7 @@ const ExamDetails = () => {
           {/* Thông tin thời gian */}
           <div className='flex flex-col col-span-7'>
             <div className='space-y-4'>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div>
-                  <p className='text-sm text-gray-500'>Thời gian bắt đầu</p>
-                  <p className='font-medium'>{formatDateTime(exam.start_time)}</p>
-                </div>
-                <div>
-                  <p className='text-sm text-gray-500'>Thời gian kết thúc</p>
-                  <p className='font-medium'>{formatDateTime(exam.end_time)}</p>
-                </div>{' '}
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-y-10'>
                 <div className='flex items-center gap-2'>
                   <CalendarClock className='w-5 h-5 text-gray-500' />
                   <div className='space-y-1'>
@@ -76,30 +68,36 @@ const ExamDetails = () => {
                     <p className='font-medium'>{exam.duration} phút</p>
                   </div>
                 </div>
+                <div className='space-y-4'>
+                  <div>
+                    <p className='text-sm text-gray-500 mb-1'>Mã truy cập (Passcode)</p>
+                    <div className='flex items-center gap-2'>
+                      <code className='bg-gray-100 px-4 py-2 rounded-lg font-mono text-lg'>{exam.passcode}</code>
+                      <Button variant='outline' size='icon' onClick={handleCopyPasscode} className='flex-shrink-0'>
+                        <Copy className='h-4 w-4' />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <p className='text-sm text-gray-500'>Thời gian bắt đầu</p>
+                  <p className='font-medium'>{formatDateTime(exam.start_time)}</p>
+                </div>
+                <div>
+                  <p className='text-sm text-gray-500'>Thời gian kết thúc</p>
+                  <p className='font-medium'>{formatDateTime(exam.end_time)}</p>
+                </div>
+                <div className='w-full col-span-2'>
+                  <h3 className='font-semibold mb-2'>Mô tả</h3>
+                  <p className='text-gray-600 whitespace-pre-wrap'>{exam.description}</p>
+                </div>
               </div>
-            </div>
-
-            {/* Mô tả */}
-            <div className='mt-5'>
-              <h3 className='font-semibold mb-2'>Mô tả</h3>
-              <p className='text-gray-600 whitespace-pre-wrap'>{exam.description}</p>
             </div>
           </div>
           {/* QR Code và Passcode */}
           <div className='flex flex-col gap-6 items-center w-full col-span-5'>
-            <div className='space-y-4 flex items-center justify-center'>
-              <div>
-                <p className='text-sm text-gray-500 mb-1'>Mã truy cập (Passcode)</p>
-                <div className='flex items-center gap-2'>
-                  <code className='bg-gray-100 px-4 py-2 rounded-lg font-mono text-lg'>{exam.passcode}</code>
-                  <Button variant='outline' size='icon' onClick={handleCopyPasscode} className='flex-shrink-0'>
-                    <Copy className='h-4 w-4' />
-                  </Button>
-                </div>
-              </div>
-            </div>
-            <div className='flex flex-col items-center space-y-4'>
-              <div className='bg-white p-4 rounded-lg'>
+            <div className='flex flex-col items-center'>
+              <div className='bg-white pb-4 rounded-lg'>
                 <QRCode value={qrValue} size={200} className='h-auto max-w-full' />
               </div>
               <p className='text-sm text-gray-500'>Quét mã QR để truy cập bài thi</p>

@@ -140,7 +140,11 @@ const SortableQuestion = ({ question, originalQuestion, questionErrors, question
         {question.isEditing && (
           <CardFooter>
             <div className='flex gap-4 justify-end w-full'>
-              <Button variant='destructive' onClick={() => props.onDelete(props.questionIndex)}>
+              <Button
+                variant='outline'
+                className='border border-red-500 text-red-500'
+                onClick={() => props.onDelete(props.questionIndex)}
+              >
                 Delete
               </Button>
               <Button onClick={() => props.onToggleEdit(question)}>Save</Button>
@@ -515,11 +519,11 @@ const CreateExam = () => {
           </SortableContext>
 
           <div className='w-full flex justify-center gap-4 py-4 mb-4' ref={addButtonRef}>
-            <Button onClick={handleAddQuestion} className='gap-2' size='lg'>
+            <Button onClick={handleAddQuestion} className='gap-2 border border-gray-500' size='lg' variant='outline'>
               <Plus className='w-4 h-4' />
               Add question
             </Button>
-            <Button onClick={handleCreateExam} className='gap-2' size='lg' variant='secondary'>
+            <Button onClick={handleCreateExam} className='gap-2' size='lg'>
               <Save className='w-4 h-4' />
               Create exam
             </Button>
