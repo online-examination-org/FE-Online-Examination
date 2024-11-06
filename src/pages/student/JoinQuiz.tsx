@@ -5,8 +5,9 @@ import { CardContent, CardDescription, CardHeader, CardTitle } from '@/component
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import PillInput from '@/components/ui/input-custom'
+import { useEffect } from 'react'
 
 const schema = yup
   .object({
@@ -29,6 +30,7 @@ type FormData = yup.InferType<typeof schema>
 export default function JoinQuiz() {
   const {
     register,
+    setValue,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset
@@ -42,6 +44,14 @@ export default function JoinQuiz() {
     }
   })
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+
+  useEffect(() => {
+    const passcodeParam = searchParams.get('passcode')
+    if (passcodeParam) {
+      setValue('passcode', passcodeParam || '')
+    }
+  }, [searchParams, setValue])
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -73,7 +83,7 @@ export default function JoinQuiz() {
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
               <div className='flex flex-col w-full gap-6'>
                 <PillInput
-                  label='Email'
+                  label='Passcode'
                   id='passcode'
                   type='passcode'
                   placeholder='Enter your passcode'
