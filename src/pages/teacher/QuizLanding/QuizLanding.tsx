@@ -96,7 +96,7 @@ function QuizLanding() {
       <div className='w-[1140px] mx-auto py-6 px-2'>
         <h2 className='text-2xl font-bold'>My examinations</h2>
         <ScrollArea className='py-4 h-[calc(100vh-130px)]'>
-          <div className='grid grid-cols-4 gap-4'>
+          <div className='grid grid-cols-4 gap-4 p-3'>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Card className='cursor-pointer'>
