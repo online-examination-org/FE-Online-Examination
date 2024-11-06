@@ -3,15 +3,8 @@ import { Button } from '@/components/ui/button'
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Trash } from 'lucide-react'
-
-interface Exam {
-  _id: string | number
-  subject: string
-  name: string
-  startTime: string
-  endTime: string
-  studentCount: number
-}
+import { Exam } from '@/types/type'
+import { formatDateTime } from '@/utils/date'
 
 interface ExamCardProps {
   exam: Exam
@@ -34,7 +27,7 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
       {/* Card Header */}
       <CardHeader className='absolute top-9 p-3'>
         <CardTitle className='flex justify-between items-center'>
-          <div className='bg-white w-4/5 p-1 rounded-sm shadow-sm'>{exam.subject}</div>
+          <div className='bg-white w-4/5 p-1 rounded-sm shadow-sm'>{exam.title}</div>
           <div className='cursor-pointer text-muted-foreground hover:text-primary'>
             <Trash className='text-black' />
           </div>
@@ -42,18 +35,18 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
 
         {/* Exam Name and Additional Information */}
         <CardDescription>
-          <div className='text-white'>{exam.name}</div>
+          <div className='text-black font-semibold'>{exam.description}</div>
           <div className='text-xs text-black mt-2'>
-            <p>Start: {exam.startTime}</p>
-            <p>End: {exam.endTime}</p>
-            <p>Students Completed: {exam.studentCount}</p>
+            <p>Start: {formatDateTime(exam.start_time)}</p>
+            <p>End: {formatDateTime(exam.end_time)}</p>
+            <p>Duration: {exam.duration} minutes</p>
           </div>
         </CardDescription>
       </CardHeader>
 
       {/* Card Footer */}
       <CardFooter className='mt-32'>
-        <Link to={`/quiz/${exam._id}`} className='w-full'>
+        <Link to={`/quiz/${exam.exam_id}`} className='w-full'>
           <Button className='w-full'>View detail</Button>
         </Link>
       </CardFooter>
