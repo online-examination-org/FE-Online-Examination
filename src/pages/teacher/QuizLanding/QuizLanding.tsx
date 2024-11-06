@@ -8,11 +8,15 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Exam } from '@/types/type'
 
 function QuizLanding() {
   const [open, setOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [startDateFilter, setStartDateFilter] = useState('')
+  const [endDateFilter, setEndDateFilter] = useState('')
+  const [examsDisplay, setExamsDisplay] = useState<Exam[]>([])
 
   const {
     register,
@@ -71,15 +75,64 @@ function QuizLanding() {
     }
   ]
 
+  useEffect(() => {
+    let filteredExams = [...exams]
+
+    // Search filter
+    if (searchTerm) {
+      filteredExams = filteredExams.filter((exam) => exam.title.toLowerCase().includes(searchTerm.toLowerCase()))
+    }
+
+    // Date range filter
+    if (startDateFilter) {
+      filteredExams = filteredExams.filter((exam) => new Date(exam.start_time) >= new Date(startDateFilter))
+    }
+
+    if (endDateFilter) {
+      filteredExams = filteredExams.filter((exam) => new Date(exam.end_time) <= new Date(endDateFilter))
+    }
+
+    setExamsDisplay(filteredExams)
+  }, [searchTerm, startDateFilter, endDateFilter, exams])
+
   return (
     <div className='bg-primary-foreground h-[calc(100vh-56px)] overflow-hidden'>
       <div className='w-[1140px] mx-auto py-6 px-2'>
-        <h2 className='text-2xl font-bold'>My examinations</h2>
+        <div className='flex flex-col justify-between mb-4 gap-4'>
+          <h2 className='text-2xl font-bold'>My examinations</h2>
+          <div className='flex gap-4'>
+            <div className='flex gap-2'>
+              <Input
+                type='text'
+                placeholder='Search by title...'
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className='w-64'
+              />
+            </div>
+            <div className='flex gap-2 items-center'>
+              <Input
+                type='datetime-local'
+                value={startDateFilter}
+                onChange={(e) => setStartDateFilter(e.target.value)}
+                className='w-48 block'
+              />
+              <span>to</span>
+              <Input
+                type='datetime-local'
+                value={endDateFilter}
+                onChange={(e) => setEndDateFilter(e.target.value)}
+                className='w-48 block'
+              />
+            </div>
+          </div>
+        </div>
+
         <ScrollArea className='py-4 h-[calc(100vh-130px)]'>
           <div className='grid grid-cols-4 gap-4 p-3'>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Card className='relative overflow-hidden bg-white hover:shadow-lg transition-all duration-300 transform hover:scale-105 rounded-lg'>
+                <Card className='min-h-[271px] relative overflow-hidden bg-white hover:shadow-lg transition-all duration-300 transform hover:scale-105 rounded-lg'>
                   <div
                     className='h-[82px] w-full bg-cover bg-center relative'
                     style={{
@@ -210,22 +263,12 @@ function QuizLanding() {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button type='submit'>Save changes</Button>
+                    <Button type='submit'>Create</Button>
                   </DialogFooter>
                 </form>
               </DialogContent>
             </Dialog>
-            {exams.map((exam) => (
-              <ExamCard key={exam.exam_id} exam={exam} />
-            ))}
-          </div>
-        </ScrollArea>
-      </div>
-      <div className='w-[1140px] mx-auto py-6 px-2'>
-        <h2 className='text-2xl font-bold'>My examinations</h2>
-        <ScrollArea className='py-4 h-[calc(100vh-130px)]'>
-          <div className='grid grid-cols-4 gap-4 p-3'>
-            {exams.map((exam) => (
+            {examsDisplay.map((exam) => (
               <ExamCard key={exam.exam_id} exam={exam} />
             ))}
           </div>
