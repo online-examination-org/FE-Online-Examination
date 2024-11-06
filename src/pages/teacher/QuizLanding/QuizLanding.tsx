@@ -18,6 +18,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { useState } from 'react'
+import { Exam } from '@/types/type'
 
 function QuizLanding() {
   const [open, setOpen] = useState(false)
@@ -43,51 +44,39 @@ function QuizLanding() {
     reset()
   }
 
-  const exams = [
+  const exams: Exam[] = [
     {
-      _id: 1,
-      name: 'Quiz 1',
-      subject: 'Advanced software engineering'
+      exam_id: 1,
+      teacher_id: 101,
+      title: 'Math Midterm',
+      passcode: 'MATH123',
+      start_time: '2024-11-10T09:00:00',
+      end_time: '2024-11-10T10:30:00',
+      duration: 90,
+      create_at: 1730217000,
+      description: 'Midterm exam covering algebra and calculus.'
     },
     {
-      _id: 2,
-      name: 'Quiz 2',
-      subject: 'Advanced software engineering'
+      exam_id: 2,
+      teacher_id: 123,
+      title: 'Test',
+      passcode: '123A123',
+      start_time: '2024-10-30T11:30:15',
+      end_time: '2024-10-30T11:45:15',
+      duration: 15,
+      create_at: 1730217888,
+      description: 'final'
     },
     {
-      _id: 3,
-      name: 'Quiz 3',
-      subject: 'Advanced software engineering'
-    },
-    {
-      _id: 4,
-      name: 'Quiz 4',
-      subject: 'Advanced software engineering'
-    },
-    {
-      _id: 5,
-      name: 'Quiz 5',
-      subject: 'Advanced software engineering'
-    },
-    {
-      _id: 6,
-      name: 'Quiz 6',
-      subject: 'Advanced software engineering'
-    },
-    {
-      _id: 7,
-      name: 'Quiz 7',
-      subject: 'Advanced software engineering'
-    },
-    {
-      _id: 8,
-      name: 'Quiz 8',
-      subject: 'Advanced software engineering'
-    },
-    {
-      _id: 9,
-      name: 'Quiz 9',
-      subject: 'Advanced software engineering'
+      exam_id: 3,
+      teacher_id: 102,
+      title: 'Physics Final',
+      passcode: 'PHY321',
+      start_time: '2024-12-15T13:00:00',
+      end_time: '2024-12-15T15:00:00',
+      duration: 120,
+      create_at: 1730219000,
+      description: 'Comprehensive final covering entire syllabus.'
     }
   ]
 
@@ -216,7 +205,7 @@ function QuizLanding() {
               </DialogContent>
             </Dialog>
             {exams.map((exam) => (
-              <ExamCard key={exam._id} exam={exam} />
+              <ExamCard key={exam.exam_id} exam={exam} />
             ))}
           </div>
         </ScrollArea>

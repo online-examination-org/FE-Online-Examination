@@ -3,15 +3,8 @@ import { Button } from '@/components/ui/button'
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Trash } from 'lucide-react'
-
-interface Exam {
-  _id: string | number
-  subject: string
-  name: string
-  startTime: string
-  endTime: string
-  studentCount: number
-}
+import { Exam } from '@/types/type'
+import { formatDateTime } from '@/utils/date'
 
 interface ExamCardProps {
   exam: Exam
@@ -19,7 +12,7 @@ interface ExamCardProps {
 
 const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
   return (
-    <Card className='relative p-0 overflow-hidden bg-gray-100 hover:scale-105 hover:border-blue-200'>
+    <Card className='relative p-0 overflow-hidden bg-gray-100 hover:scale-105 hover:border-blue-200 rounded-lg'>
       {/* Background Image */}
       <div
         className='h-[82px] w-full bg-cover bg-center'
@@ -34,22 +27,30 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
       {/* Card Header */}
       <CardHeader className='absolute top-14 left-0 right-0 p-3'>
         <CardTitle className='flex justify-center items-center'>
-          <div className='bg-white w-full px-1 py-2 rounded-sm shadow-sm truncate'>{exam.subject}</div>
+          <div className='bg-white w-full px-3 py-3 rounded-sm shadow-sm border border-gray-300 truncate'>
+            {exam.title}
+          </div>
         </CardTitle>
 
         {/* Exam Name and Additional Information */}
         <CardDescription>
-          <div className='text-xs text-black mt-2'>
-            <p>Start: {exam.startTime}</p>
-            <p>End: {exam.endTime}</p>
-            <p>Students Completed: {exam.studentCount}</p>
+          <div className='text-sm text-black mt-2 px-3 flex flex-col gap-1'>
+            <p>
+              <strong>Start:</strong> {formatDateTime(exam.start_time)}
+            </p>
+            <p>
+              <strong>End:</strong> {formatDateTime(exam.end_time)}
+            </p>
+            <p>
+              <strong>Duration:</strong> {exam.duration} minutes
+            </p>
           </div>
         </CardDescription>
       </CardHeader>
 
       {/* Card Footer */}
-      <CardFooter className='mt-24 px-3 w-full flex items-center justify-between'>
-        <Link to={`/quiz/${exam._id}`} className='w-4/5'>
+      <CardFooter className='mt-32 px-3 w-full flex items-center justify-between'>
+        <Link to={`/quiz/${exam.exam_id}`} className='w-4/5'>
           <Button className='w-full'>View detail</Button>
         </Link>
         <div className='w-1/5 cursor-pointer text-muted-foreground hover:text-primary bg-white rounded-sm flex items-center justify-center'>
