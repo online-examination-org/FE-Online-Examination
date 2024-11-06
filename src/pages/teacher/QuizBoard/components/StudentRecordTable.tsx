@@ -5,8 +5,8 @@ const StudentRecordTable = () => {
   const navigate = useNavigate()
 
   return (
-    <div className='overflow-x-auto px-2'>
-      <table className='min-w-full bg-white border border-gray-300'>
+    <div className='overflow-x-auto px-2 w-full mx-auto '>
+      <table className='min-w-full bg-white border border-gray-300 rounded-md'>
         <thead>
           <tr>
             <th className='py-2 px-4 border-b text-start'>Student ID</th>

@@ -51,7 +51,7 @@ const ExamDetails = () => {
   }
 
   return (
-    <div className='w-full mx-auto'>
+    <div className='w-full mx-auto  px-2 '>
       <Card className='rounded-md'>
         <CardHeader>
           <CardTitle className='text-2xl font-bold'>{exam.title}</CardTitle>
