@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Copy, CalendarClock } from 'lucide-react'
 import QRCode from 'react-qr-code'
 import { format } from 'date-fns'
+import { useToast } from '@/hooks/use-toast'
 
 // interface ExamProps {
 //   exam: {
@@ -32,13 +33,14 @@ const exam = {
 }
 
 const ExamDetails = () => {
+  const { toast } = useToast()
   const handleCopyPasscode = async () => {
     try {
       await navigator.clipboard.writeText(exam.passcode)
-      alert('Đã copy passcode!')
+      toast({ description: 'Passcode copied successfully' })
     } catch (err) {
       console.error('Failed to copy passcode:', err)
-      alert('Không thể copy passcode!')
+      toast({ description: 'Failed to copy passcode', variant: 'destructive' })
     }
   }
 
@@ -62,15 +64,15 @@ const ExamDetails = () => {
             <div className='space-y-4'>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-y-10'>
                 <div className='flex items-center gap-2'>
-                  <CalendarClock className='w-5 h-5 text-gray-500' />
+                  {/* <CalendarClock className='w-5 h-5 text-gray-500' /> */}
                   <div className='space-y-1'>
-                    <p className='text-sm text-gray-500'>Thời gian làm bài</p>
-                    <p className='font-medium'>{exam.duration} phút</p>
+                    <p className='text-sm text-gray-500'>Duration</p>
+                    <p className='font-medium'>{exam.duration} minutes</p>
                   </div>
                 </div>
                 <div className='space-y-4'>
                   <div>
-                    <p className='text-sm text-gray-500 mb-1'>Mã truy cập (Passcode)</p>
+                    <p className='text-sm text-gray-500 mb-1'>Passcode</p>
                     <div className='flex items-center gap-2'>
                       <code className='bg-gray-100 px-4 py-2 rounded-lg font-mono text-lg'>{exam.passcode}</code>
                       <Button variant='outline' size='icon' onClick={handleCopyPasscode} className='flex-shrink-0'>
@@ -80,15 +82,15 @@ const ExamDetails = () => {
                   </div>
                 </div>
                 <div>
-                  <p className='text-sm text-gray-500'>Thời gian bắt đầu</p>
+                  <p className='text-sm text-gray-500'>Start time</p>
                   <p className='font-medium'>{formatDateTime(exam.start_time)}</p>
                 </div>
                 <div>
-                  <p className='text-sm text-gray-500'>Thời gian kết thúc</p>
+                  <p className='text-sm text-gray-500'>End time</p>
                   <p className='font-medium'>{formatDateTime(exam.end_time)}</p>
                 </div>
                 <div className='w-full col-span-2'>
-                  <h3 className='font-semibold mb-2'>Mô tả</h3>
+                  <h3 className='font-semibold mb-2'>Description</h3>
                   <p className='text-gray-600 whitespace-pre-wrap'>{exam.description}</p>
                 </div>
               </div>
@@ -100,7 +102,7 @@ const ExamDetails = () => {
               <div className='bg-white pb-4 rounded-lg'>
                 <QRCode value={qrValue} size={200} className='h-auto max-w-full' />
               </div>
-              <p className='text-sm text-gray-500'>Quét mã QR để truy cập bài thi</p>
+              <p className='text-sm text-gray-500'>Scan the QR code to access the exam</p>
             </div>
           </div>
         </CardContent>

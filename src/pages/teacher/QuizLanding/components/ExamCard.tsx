@@ -53,7 +53,7 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
       {/* Card Footer */}
       <CardFooter className='mt-32 px-3 w-full flex items-center justify-between'>
         <Link to={`/quiz/${exam.exam_id}`} className='w-4/5'>
-          <Button className='w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold transition-all duration-200'>
+          <Button className='w-full bg-violet-950 hover:bg-violet-800 text-white font-semibold transition-all duration-200'>
             View detail
           </Button>
         </Link>
@@ -62,7 +62,7 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
           aria-label='Delete Exam'
           title='Delete Exam'
         >
-          <Trash className='text-gray-500 hover:text-red-600' />
+          <Trash className='text-violet-950 hover:text-violet-800' />
         </button>
       </CardFooter>
     </Card>
