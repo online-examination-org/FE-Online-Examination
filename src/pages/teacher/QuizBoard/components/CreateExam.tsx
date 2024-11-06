@@ -1,7 +1,7 @@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -36,8 +36,8 @@ const SortableQuestion = ({ question, originalQuestion, questionErrors, question
   }
 
   return (
-    <div className='w-full' ref={setNodeRef} style={style}>
-      <Card className='w-full'>
+    <div className='w-full mb-7 px-3' ref={setNodeRef} style={style}>
+      <Card className='w-full rounded-lg'>
         <CardHeader>
           <div className='flex items-center justify-between gap-6'>
             <div className='flex items-center gap-4 flex-1'>
@@ -215,10 +215,14 @@ const CreateExam = () => {
         isEditing: true
       }
     }))
-    setTimeout(() => {
-      addButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }, 0)
+    // setTimeout(() => {
+    //   addButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    // }, 0)
   }
+
+  useEffect(() => {
+    if (questions.length === 0) handleAddQuestion()
+  }, [])
 
   const handleCreateExam = () => {
     if (questions.length === 0) {
@@ -347,8 +351,8 @@ const CreateExam = () => {
   }
 
   return (
-    <div className='h-[80vh] px-2'>
-      <div className='container items-center justify-start mx-auto w-full'>
+    <div className='w-full mx-auto'>
+      {/* <div className='container items-center justify-start mx-auto w-full'>
         <Card className='w-full'>
           <CardHeader>
             <div className='flex justify-between items-center'>
@@ -486,10 +490,9 @@ const CreateExam = () => {
             </div>
           </CardHeader>
         </Card>
-      </div>
-
-      <ScrollArea className='container flex flex-col gap-4 items-start justify-center mx-auto w-full h-[70vh] mt-10'>
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      </div> */}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <ScrollArea className='container flex flex-col gap-2 items-start justify-center mx-auto w-full h-[80vh] py-3'>
           <SortableContext items={questions.map((q) => q.id)} strategy={verticalListSortingStrategy}>
             {questions.map((originalQuestion, index) => {
               const question = getQuestionDisplayData(originalQuestion)
@@ -510,19 +513,19 @@ const CreateExam = () => {
               )
             })}
           </SortableContext>
-        </DndContext>
 
-        <div className='w-full flex justify-center gap-4 py-8' ref={addButtonRef}>
-          <Button onClick={handleAddQuestion} className='gap-2' size='lg'>
-            <Plus className='w-4 h-4' />
-            Add question
-          </Button>
-          <Button onClick={handleCreateExam} className='gap-2' size='lg' variant='secondary'>
-            <Save className='w-4 h-4' />
-            Create exam
-          </Button>
-        </div>
-      </ScrollArea>
+          <div className='w-full flex justify-center gap-4 py-4 mb-4' ref={addButtonRef}>
+            <Button onClick={handleAddQuestion} className='gap-2' size='lg'>
+              <Plus className='w-4 h-4' />
+              Add question
+            </Button>
+            <Button onClick={handleCreateExam} className='gap-2' size='lg' variant='secondary'>
+              <Save className='w-4 h-4' />
+              Create exam
+            </Button>
+          </div>
+        </ScrollArea>
+      </DndContext>
     </div>
   )
 }
