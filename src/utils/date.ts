@@ -9,9 +9,8 @@ export const formatDateTime = (isoString: string) => {
   return `${day}-${month}-${year} ${hours}:${minutes}`
 }
 
-export const toISOStringMinus7Hours = (dateString: string) => {
-  const inputDate = new Date(dateString) // chuyển đổi string thành Date object
-  console.log(inputDate)
-  const adjustedDate = new Date(inputDate.getTime() - 7 * 60 * 60 * 1000) // trừ 7 giờ
-  return adjustedDate.toISOString() // chuyển thành ISO string
-}
+// export const toUTC = () => {
+//   const localDate = new Date('2024-11-08T21:58:00+07:00')
+//   const utcDate = new Date(localDate.getTime() - 7 * 60 * 60 * 1000)
+//   return utcDate.toISOString()
+// }

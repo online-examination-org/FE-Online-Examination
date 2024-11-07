@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { User, Clock, Calendar, Award, LayoutGrid, List } from 'lucide-react'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { ExamResult } from '@/types/type'
 
 interface StudentRecord {
   id: string
@@ -15,33 +16,12 @@ interface StudentRecord {
   submittedAt: string
 }
 
-const StudentRecordDisplay = () => {
+interface StudentRecordTableProps {
+  results: ExamResult[]
+}
+const StudentRecordDisplay: React.FC<StudentRecordTableProps> = ({ results }) => {
   const navigate = useNavigate()
   const [viewType, setViewType] = useState<'grid' | 'list'>('list')
-
-  const studentsData: StudentRecord[] = [
-    {
-      id: 'STU001',
-      name: 'John Doe',
-      score: 85,
-      completionTime: '45 minutes',
-      submittedAt: '2024-03-15 14:30'
-    },
-    {
-      id: 'STU002',
-      name: 'Jane Smith',
-      score: 92,
-      completionTime: '38 minutes',
-      submittedAt: '2024-03-15 14:25'
-    },
-    {
-      id: 'STU003',
-      name: 'Jane Poeny',
-      score: 100,
-      completionTime: '38 minutes',
-      submittedAt: '2024-03-15 14:25'
-    }
-  ]
 
   const getScoreColor = (score: number) => {
     if (score >= 90) return 'bg-green-100 text-green-800'
@@ -51,8 +31,8 @@ const StudentRecordDisplay = () => {
 
   const CardView = () => (
     <div className='grid gap-4 md:grid-cols-4'>
-      {studentsData.map((student) => (
-        <Card key={student.id} className='hover:shadow-lg transition-shadow'>
+      {results.map((result) => (
+        <Card key={result.examResultId} className='hover:shadow-lg transition-shadow'>
           <CardContent className='pt-6'>
             <div className='flex items-start justify-between'>
               <div className='flex items-center w-full space-x-3'>
@@ -60,8 +40,8 @@ const StudentRecordDisplay = () => {
                   <User className='h-6 w-6 text-gray-600' />
                 </div>
                 <div>
-                  <h3 className='font-semibold text-md'>{student.name}</h3>
-                  <p className='text-sm text-gray-500'>ID: {student.id}</p>
+                  <h3 className='font-semibold text-md'>{result.name}</h3>
+                  <p className='text-sm text-gray-500'>ID: {result.studentId}</p>
                 </div>
               </div>
             </div>
@@ -69,20 +49,22 @@ const StudentRecordDisplay = () => {
             <div className='mt-4 space-y-2'>
               <div className='flex items-center text-sm text-gray-600'>
                 <Clock className='h-4 w-4 mr-2' />
-                Completion: {student.completionTime}
+                Completion: {result.finishedAt}
               </div>
               <div className='flex items-center text-sm text-gray-600'>
                 <Calendar className='h-4 w-4 mr-2' />
-                Submitted: {student.submittedAt}
+                Submitted: {result.finishedAt}
               </div>
             </div>
 
             <div className='mt-4 flex justify-between'>
-              <Badge className={`${getScoreColor(student.score)} text-sm px-3 py-1`}>{student.score}%</Badge>
+              <Badge className={`${getScoreColor(result.score ? parseInt(result.score) : 0)} text-sm px-3 py-1`}>
+                {result.score || 0}%
+              </Badge>
               <Button
                 variant='outline'
                 className='flex items-center gap-2'
-                onClick={() => navigate(`/quiz/2/student/${student.id}`)}
+                onClick={() => navigate(`/quiz/2/student/${result.studentId}`)}
               >
                 <Award className='h-4 w-4' />
                 View Details
@@ -107,30 +89,32 @@ const StudentRecordDisplay = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {studentsData.map((student) => (
-          <TableRow key={student.id} className='h-[50px]'>
+        {results.map((result) => (
+          <TableRow key={result.examResultId} className='h-[50px]'>
             <TableCell className='font-medium'>
               <div className='flex items-center gap-2'>
                 <div className='h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center'>
                   <User className='h-4 w-4 text-gray-600' />
                 </div>
-                {student.name}
+                {result.name}
               </div>
             </TableCell>
-            <TableCell>{student.id}</TableCell>
+            <TableCell>{result.examResultId}</TableCell>
             <TableCell className='text-center'>
-              <Badge className={`${getScoreColor(student.score)}`}>{student.score}%</Badge>
+              <Badge className={`${getScoreColor(result.score ? parseInt(result.score) : 0)}`}>
+                {result.score || 0}%
+              </Badge>
             </TableCell>
             <TableCell>
               <div className='flex items-center gap-2'>
                 <Clock className='h-4 w-4 text-gray-500' />
-                {student.completionTime}
+                {result.finishedAt}
               </div>
             </TableCell>
             <TableCell>
               <div className='flex items-center gap-2'>
                 <Calendar className='h-4 w-4 text-gray-500' />
-                {student.submittedAt}
+                {result.finishedAt}
               </div>
             </TableCell>
             <TableCell className='text-right'>

@@ -5,12 +5,27 @@ import CreateExam from './components/CreateExam'
 import StudentRecordTable from './components/StudentRecordTable'
 import { useSelector } from 'react-redux'
 import ExamDetails from './components/ExamDetails'
+import { getExamResults } from '@/services/examResults.services'
+import { useEffect, useState } from 'react'
 
 const QuizBoard: React.FC = () => {
   const user = useSelector((state: any) => state.user)
   const { id } = useParams()
+  const [results, setResults] = useState([])
   console.log(id, user)
-
+  useEffect(() => {
+    const fetchResults = async () => {
+      try {
+        if (id) {
+          const response = await getExamResults(id)
+          setResults(response.data || [])
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    }
+    fetchResults()
+  }, [id])
   return (
     <div className='bg-primary-foreground h-[calc(100vh-56px)] overflow-hidden'>
       <div className='w-[1140px] mx-auto py-6 px-2'>
@@ -35,7 +50,7 @@ const QuizBoard: React.FC = () => {
             <ExamDetails />
           </TabsContent>
           <TabsContent value='result'>
-            <StudentRecordTable />
+            <StudentRecordTable results={results} />
           </TabsContent>
           <TabsContent value='question'>
             <CreateExam />

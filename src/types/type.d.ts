@@ -46,3 +46,15 @@ export interface Exam {
   teacher: Teacher
   isActive: boolean
 }
+
+export interface ExamResult {
+  createdAt: string
+  updatedAt: string
+  examResultId: number
+  name: string
+  studentId: string
+  email: string
+  score: string
+  startedAt: string
+  finishedAt: string
+}

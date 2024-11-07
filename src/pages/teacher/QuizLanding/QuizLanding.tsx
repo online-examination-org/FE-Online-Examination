@@ -12,8 +12,7 @@ import { useState, useEffect } from 'react'
 import { CreateExamBody, Exam } from '@/types/type'
 import { getExams } from '@/services/teachers.services'
 import { useToast } from '@/hooks/use-toast'
-import { createExam } from '@/services/exams.services'
-import { toISOStringMinus7Hours } from '@/utils/date'
+import { createExam, deleteExam } from '@/services/exams.services'
 
 function QuizLanding() {
   const [open, setOpen] = useState(false)
@@ -32,18 +31,19 @@ function QuizLanding() {
     return new Date(date.getTime() + 7 * 60 * 60 * 1000)
   }
 
-  // Chuyển từ UTC+7 sang UTC+0
-  const convertToUTC = (date: Date) => {
-    return new Date(date.getTime() - 7 * 60 * 60 * 1000)
+  const onCreateNewExam = async (payload: CreateExamBody) => {
+    try {
+      const response = await createExam(payload)
+      console.log(response)
+      setRefresh(!refresh)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
-  const createNewExam = async (payload: CreateExamBody) => {
+  const onDeleteExam = async (examId: number) => {
     try {
-      const response = await createExam({
-        ...payload,
-        startTime: toISOStringMinus7Hours(payload.startTime),
-        endTime: toISOStringMinus7Hours(payload.endTime)
-      })
+      const response = await deleteExam(examId)
       console.log(response)
       setRefresh(!refresh)
     } catch (err) {
@@ -92,14 +92,14 @@ function QuizLanding() {
   })
 
   const onSubmit = async (data: CreateExamBody) => {
-    console.log({
+    console.log(data)
+    await onCreateNewExam({
       ...data,
-      startTime: toISOStringMinus7Hours(data.startTime),
-      endTime: toISOStringMinus7Hours(data.endTime)
+      startTime: new Date(data.startTime).toISOString(),
+      endTime: new Date(data.endTime).toISOString()
     })
-    //await createNewExam(data)
     setOpen(false)
-    //reset()
+    reset()
   }
 
   useEffect(() => {
@@ -185,7 +185,7 @@ function QuizLanding() {
           <div className='grid grid-cols-4 gap-4 p-3'>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Card className='min-h-[271px] relative overflow-hidden bg-white hover:shadow-lg transition-all duration-300 transform hover:scale-105 rounded-lg'>
+                <Card className='cursor-pointer min-h-[271px] relative overflow-hidden bg-white hover:shadow-lg transition-all duration-300 transform hover:scale-105 rounded-lg'>
                   <div
                     className='h-[82px] w-full bg-cover bg-center relative'
                     style={{
@@ -325,7 +325,7 @@ function QuizLanding() {
             {loading
               ? // Show 8 skeleton cards while loading
                 [...Array(8)].map((_, index) => <ExamCardSkeleton key={index} />)
-              : examsDisplay.map((exam) => <ExamCard key={exam.examId} exam={exam} />)}
+              : examsDisplay.map((exam) => <ExamCard key={exam.examId} exam={exam} onDeleteExam={onDeleteExam} />)}
           </div>
         </ScrollArea>
       </div>
