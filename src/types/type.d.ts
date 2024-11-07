@@ -11,8 +11,8 @@ export interface RegisterBody {
 
 export interface CreateExamBody {
   title: string
-  start_time: string
-  end_time: string
+  startTime: string
+  endTime: string
   duration: number
   description: string
 }
@@ -24,21 +24,25 @@ export interface Profile {
   role: string
 }
 
+interface Teacher {
+  createdAt: string
+  updatedAt: string
+  id: number
+  name: string
+  email: string
+  password: string
+}
+
 export interface Exam {
-  exam_id: number
-  teacher_id: number
+  createdAt: string
+  updatedAt: string
+  examId: number
   title: string
   passcode: string
-  start_time: string // ISO 8601 format, consider Date if you need date handling
-  end_time: string // ISO 8601 format, consider Date if you need date handling
-  duration: number // duration in minutes
-  create_at: number // Unix timestamp
+  startTime: string
+  endTime: string
+  duration: number
   description: string
+  teacher: Teacher
+  isActive: boolean
 }
-// export interface UpdateExamBody {
-//   title: string
-//   start_time: string
-//   end_time: string
-//   duration: number
-//   description: string
-// }

@@ -38,10 +38,10 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
         <CardDescription>
           <div className='text-sm text-gray-800 mt-2 px-3 flex flex-col gap-1'>
             <p>
-              <strong>Start:</strong> {formatDateTime(exam.start_time)}
+              <strong>Start:</strong> {formatDateTime(exam.startTime)}
             </p>
             <p>
-              <strong>End:</strong> {formatDateTime(exam.end_time)}
+              <strong>End:</strong> {formatDateTime(exam.endTime)}
             </p>
             <p>
               <strong>Duration:</strong> {exam.duration} minutes
@@ -52,7 +52,7 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
 
       {/* Card Footer */}
       <CardFooter className='mt-32 px-3 w-full flex items-center justify-between'>
-        <Link to={`/quiz/${exam.exam_id}`} className='w-4/5'>
+        <Link to={`/quiz/${exam.examId}`} className='w-4/5'>
           <Button className='w-full bg-violet-950 hover:bg-violet-800 text-white font-semibold transition-all duration-200'>
             View detail
           </Button>
