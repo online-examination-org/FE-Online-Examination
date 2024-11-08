@@ -89,3 +89,15 @@ export interface EditQuestionBody {
     [key: string]: string
   }
 }
+
+export interface JoinPayloadProps {
+  name: string
+  studendId: string
+  mail: string
+  passcode: string
+}
+
+interface SubmitQuizProps {
+  exam_result_id: string
+  finish_at: string
+}

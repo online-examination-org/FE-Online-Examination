@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useNavigate } from 'react-router-dom'
 
 interface TestInfo {
@@ -38,6 +38,18 @@ export default function StartQuiz() {
 
     fetchTestInfo()
   }, [])
+
+  const handleStartQuiz = () => {
+    try {
+      navigate('/do-test')
+      const startTime = new Date()
+      localStorage.setItem('start_time', startTime.toISOString())
+      const endTime = new Date(startTime.getTime() + 1 * 60 * 1000)
+      localStorage.setItem('end_time', endTime.toISOString())
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   const formatDateTime = (dateTimeString: string) => {
     return new Date(dateTimeString).toLocaleString('en-US', {
@@ -109,14 +121,7 @@ export default function StartQuiz() {
             </div>
 
             {/* Start Test Button */}
-            <Button
-              className='w-full font-semibold'
-              onClick={() => {
-                // Handle start test logic
-                navigate('/make-quiz')
-                console.log('Starting test...')
-              }}
-            >
+            <Button className='w-full font-semibold' onClick={handleStartQuiz}>
               START TEST
             </Button>
           </CardContent>

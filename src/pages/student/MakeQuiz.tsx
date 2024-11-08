@@ -38,11 +38,6 @@ interface Answers {
   [key: number]: string
 }
 
-// interface MakeQuizProps {
-//   quiz?: QuizProps
-//   onSubmit?: (answers: Answers) => void
-// }
-
 interface SubmissionData {
   timestamp: string
   quizTitle: string
@@ -54,7 +49,10 @@ const MakeQuiz = () => {
   const questionRefs = useRef<(HTMLDivElement | null)[]>([])
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0)
   const [answers, setAnswers] = useState<Answers>({})
-  const [timeRemaining, setTimeRemaining] = useState<number>(quizData.quiz.timeLimit * 60)
+  const [timeRemaining, setTimeRemaining] = useState<number>(() => {
+    const endTime = localStorage.getItem('end_time')
+    return endTime ? Math.floor((new Date(endTime).getTime() - new Date().getTime()) / 1000) : 0
+  })
   // const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [showAlert, setShowAlert] = useState<boolean>(false)
   const [alertMessage, setAlertMessage] = useState<string>('')
@@ -199,7 +197,7 @@ const MakeQuiz = () => {
             onClick={() => goToQuestion(question.id)}
           >
             {question.id + 1}
-            {question.required && <span className='absolute -top-1 -right-1 text-red-500 text-xs'>*</span>}
+            {/* {question.required && <span className='absolute -top-1 -right-1 text-red-500 text-xs'>*</span>} */}
           </Button>
         ))}
       </div>

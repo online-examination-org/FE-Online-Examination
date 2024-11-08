@@ -56,9 +56,13 @@ export default function JoinQuiz() {
   const onSubmit = async (data: FormData) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      console.log('Form submitted:', data)
-      reset()
-      navigate('/start')
+      console.log('Form submitted:', JSON.stringify(data, null, 2))
+
+      // set student token
+      localStorage.setItem('st_access_token', '')
+
+      // reset()
+      // navigate('/start')
     } catch (error) {
       console.error('Error submitting form:', error)
     }
@@ -120,7 +124,7 @@ export default function JoinQuiz() {
                 />
                 <Button className='w-full font-semibold min-h-[45px]' type='submit' disabled={isSubmitting}>
                   {isSubmitting ? 'Submitting...' : 'Submit'}
-                </Button>{' '}
+                </Button>
               </div>
             </form>
           </CardContent>

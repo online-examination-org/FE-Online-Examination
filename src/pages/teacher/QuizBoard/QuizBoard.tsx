@@ -46,7 +46,7 @@ const QuizBoard: React.FC = () => {
         questionText: item.questionText,
         questionType: item.questionType,
         answer: item.answer,
-        choices: item.choices || {} // Handle null case by providing empty object as default
+        choices: item.choices || {}
       }))
       setQuestions(mappedQuestions)
     } catch (err) {
@@ -72,7 +72,7 @@ const QuizBoard: React.FC = () => {
       <div className='w-[1140px] mx-auto py-6 px-2'>
         <div className='flex items-center gap-[24px]'>
           <DocumentIcon />
-          <h2 className='text-2xl font-bold'>Quiz 1 - Software engineering (CO3005)</h2>
+          <h2 className='text-2xl font-bold'>{exam?.title || 'Exam title'}</h2>
         </div>
         <Tabs defaultValue='general' className='w-full mx-auto mt-4'>
           <TabsList className='grid w-full grid-cols-3 h-[50px] mb-5 border'>

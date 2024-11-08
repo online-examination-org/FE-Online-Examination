@@ -122,7 +122,7 @@ const StudentRecordDisplay: React.FC<StudentRecordTableProps> = ({ results }) =>
                 variant='outline'
                 size='sm'
                 className='flex items-center gap-2'
-                onClick={() => navigate(`/quiz/2/student/${student.id}`)}
+                onClick={() => navigate(`/quiz/2/student/${result.examResultId}`)}
               >
                 <Award className='h-4 w-4' />
                 View Details
