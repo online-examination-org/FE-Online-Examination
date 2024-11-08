@@ -4,11 +4,14 @@ import './index.css'
 import App from './App.tsx'
 import store from './store/index.tsx'
 import { Provider } from 'react-redux'
+import ExamsProvider from './contexts/ExamsContext.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
-      <App />
+      <ExamsProvider>
+        <App />
+      </ExamsProvider>
     </Provider>
   </StrictMode>
 )

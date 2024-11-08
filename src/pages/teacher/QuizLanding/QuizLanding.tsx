@@ -13,6 +13,7 @@ import { CreateExamBody, Exam } from '@/types/type'
 import { getExams } from '@/services/teachers.services'
 import { useToast } from '@/hooks/use-toast'
 import { createExam, deleteExam } from '@/services/exams.services'
+import { useExams } from '@/contexts/ExamsContext'
 
 function QuizLanding() {
   const [open, setOpen] = useState(false)
@@ -20,11 +21,13 @@ function QuizLanding() {
   const [startDateFilter, setStartDateFilter] = useState('')
   const [endDateFilter, setEndDateFilter] = useState('')
   const [examsDisplay, setExamsDisplay] = useState<Exam[]>([])
-  const [exams, setExams] = useState<Exam[]>([])
+  //const [exams, setExams] = useState<Exam[]>([])
   const [loading, setLoading] = useState(true)
   const [refresh, setRefresh] = useState(true)
 
   const { toast } = useToast()
+
+  const { exams, setExams } = useExams()
 
   // Hàm chuyển đổi giờ UTC sang UTC+7
   const convertToVietnamTime = (date: Date) => {
@@ -38,6 +41,7 @@ function QuizLanding() {
       setRefresh(!refresh)
     } catch (err) {
       console.log(err)
+      toast({ description: 'Failed to create new exam', variant: 'destructive' })
     }
   }
 
@@ -48,6 +52,7 @@ function QuizLanding() {
       setRefresh(!refresh)
     } catch (err) {
       console.log(err)
+      toast({ description: 'Failed to delete exam', variant: 'destructive' })
     }
   }
 

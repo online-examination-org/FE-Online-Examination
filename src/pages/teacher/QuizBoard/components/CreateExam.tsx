@@ -1,50 +1,169 @@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Pencil, Plus, Save, GripVertical } from 'lucide-react'
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
+import { Pencil, Plus } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { CreateQuestionBody, EditQuestionBody, Question } from '@/types/type'
+import { createQuestion, editQuestion, deleteQuestion } from '@/services/questions.services'
 
-const SortableQuestion = ({ question, originalQuestion, questionErrors, questionNumber, ...props }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: question.id })
+interface CreateExamProps {
+  questions: Question[]
+  exam_id: number | string
+  setRefresh: () => void
+}
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition
+const transformQuestionForAPI = (question) => {
+  const baseData = {
+    questionId: question.id,
+    questionText: question.questionText,
+    questionType: question.questionType
   }
 
+  if (question.questionType === 'multipleChoice') {
+    const choices = {}
+    question.choices.forEach((choice, index) => {
+      choices[index] = choice
+    })
+
+    return {
+      ...baseData,
+      choices,
+      answer: question.choices[parseInt(question.answer)]
+    }
+  }
+
+  return {
+    ...baseData,
+    answer: question.shortAnswer
+  }
+}
+
+const QuestionItem = ({ question, originalQuestion, questionErrors, questionNumber, exam_id, ...props }) => {
+  const [isVisible, setIsVisible] = useState(true)
+
+  const validateBeforeSave = (question) => {
+    const errors = {}
+
+    if (!question.questionText.trim()) {
+      errors.questionText = 'Question text is required'
+    }
+
+    if (question.questionType === 'multipleChoice') {
+      if (question.answer === '') {
+        errors.answer = 'Please select an answer'
+        return errors
+      }
+      if (question.choices.some((choice) => !choice.trim())) {
+        errors.choices = 'All options must be filled'
+      }
+    } else if (question.questionType === 'shortQuestion') {
+      if (!question.shortAnswer?.trim()) {
+        errors.shortAnswer = 'Answer is required'
+      }
+    }
+
+    return errors
+  }
+
+  const handleDelete = async () => {
+    try {
+      if (originalQuestion.id && originalQuestion.id !== 'new') {
+        await deleteQuestion(originalQuestion.id, exam_id.toString())
+        setIsVisible(false)
+        props.setRefresh()
+      } else {
+        props.onDelete(props.questionIndex)
+      }
+    } catch (error) {
+      console.error('Error deleting question:', error)
+    }
+  }
+
+  const handleSave = async () => {
+    try {
+      const validationErrors = validateBeforeSave(question)
+      if (Object.keys(validationErrors).length > 0) {
+        props.onValidationErrors(question.id, validationErrors)
+        return
+      }
+
+      const questionData = transformQuestionForAPI(question)
+
+      const isExistingQuestion = originalQuestion.id && originalQuestion.id !== 'new'
+
+      if (isExistingQuestion) {
+        let payload
+        if (questionData.questionType === 'multipleChoice') {
+          const letters = ['A', 'B', 'C', 'D']
+          const newChoices = Object.fromEntries(
+            Object.entries(questionData.choices).map(([key, value], index) => [letters[index], value])
+          )
+          payload = {
+            ...questionData,
+            choices: newChoices,
+            exam_id,
+            questionId: originalQuestion.id
+          }
+        } else {
+          payload = {
+            ...questionData,
+            exam_id,
+            questionId: originalQuestion.id
+          }
+        }
+
+        try {
+          await editQuestion(originalQuestion.id, exam_id, payload as EditQuestionBody)
+          props.setRefresh()
+        } catch (err) {
+          console.error('Error updating question:', err)
+          throw err
+        }
+      } else {
+        let payload
+        if (questionData.questionType === 'multipleChoice') {
+          const letters = ['A', 'B', 'C', 'D']
+          const newChoices = Object.fromEntries(
+            Object.entries(questionData.choices).map(([key, value], index) => [letters[index], value])
+          )
+          payload = {
+            ...questionData,
+            choices: newChoices,
+            exam_id
+          }
+        } else {
+          payload = {
+            ...questionData,
+            exam_id
+          }
+        }
+
+        try {
+          await createQuestion([payload] as CreateQuestionBody[])
+          props.setRefresh()
+        } catch (err) {
+          console.error('Error creating question:', err)
+          throw err
+        }
+      }
+      props.onToggleEdit(question)
+    } catch (error) {
+      console.error('Error saving question:', error)
+    }
+  }
+
+  if (!isVisible) return null
+
   return (
-    <div className='w-full mb-7 px-3' ref={setNodeRef} style={style}>
+    <div className='w-full mb-7 px-3'>
       <Card className='w-full rounded-lg'>
         <CardHeader>
           <div className='flex items-center justify-between gap-6'>
             <div className='flex items-center gap-4 flex-1'>
-              <div {...attributes} {...listeners} className='cursor-grab active:cursor-grabbing'>
-                <GripVertical className='w-5 h-5 text-gray-400' />
-              </div>
-
               <div className='flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 font-medium'>
                 {questionNumber}
               </div>
@@ -140,14 +259,10 @@ const SortableQuestion = ({ question, originalQuestion, questionErrors, question
         {question.isEditing && (
           <CardFooter>
             <div className='flex gap-4 justify-end w-full'>
-              <Button
-                variant='outline'
-                className='border border-red-500 text-red-500'
-                onClick={() => props.onDelete(props.questionIndex)}
-              >
+              <Button variant='outline' className='border border-red-500 text-red-500' onClick={handleDelete}>
                 Delete
               </Button>
-              <Button onClick={() => props.onToggleEdit(question)}>Save</Button>
+              <Button onClick={handleSave}>Save</Button>
             </div>
           </CardFooter>
         )}
@@ -156,7 +271,7 @@ const SortableQuestion = ({ question, originalQuestion, questionErrors, question
   )
 }
 
-const CreateExam = () => {
+const CreateExam = ({ questions: initialQuestions, exam_id, setRefresh }: CreateExamProps) => {
   const initialQuestion = {
     questionText: 'New question',
     questionType: 'multipleChoice',
@@ -166,51 +281,44 @@ const CreateExam = () => {
     isEditing: true
   }
 
-  const [quizConfig, setQuizConfig] = useState({
-    title: 'Quiz 01',
-    passcode: '',
-    startTime: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
-    endTime: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
-    duration: 30,
-    description: 'This is quiz description'
-  })
+  const transformInitialQuestions = () => {
+    if (!initialQuestions?.length) return []
 
-  const [quizConfigDisplay, setQuizConfigDisplay] = useState({
-    title: 'Quiz 01',
-    passcode: '',
-    startTime: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
-    endTime: new Date(new Date().getTime() + 7 * 60 * 60 * 1000),
-    duration: 30,
-    description: 'This is quiz description'
-  })
-
-  const [questions, setQuestions] = useState([])
-  const [editingStates, setEditingStates] = useState({})
-  const [errors, setErrors] = useState({})
-  const addButtonRef = useRef(null)
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates
-    })
-  )
-
-  const handleDragEnd = (event) => {
-    const { active, over } = event
-
-    if (active.id !== over.id) {
-      setQuestions((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id)
-        const newIndex = items.findIndex((item) => item.id === over.id)
-
-        return arrayMove(items, oldIndex, newIndex)
-      })
-    }
+    return initialQuestions.map((q) => ({
+      id: q.questionId,
+      questionText: q.questionText,
+      questionType: q.questionType,
+      choices: q.questionType === 'multipleChoice' ? Object.values(q.choices || {}) : [],
+      answer:
+        q.questionType === 'multipleChoice'
+          ? Object.entries(q.choices || {})
+              .findIndex(([_, value]) => value === q.answer)
+              .toString()
+          : '',
+      shortAnswer: q.questionType === 'shortQuestion' ? q.answer : '',
+      isEditing: false
+    }))
   }
 
+  const [questions, setQuestions] = useState(transformInitialQuestions)
+  const [editingStates, setEditingStates] = useState({})
+  const [errors, setErrors] = useState({})
+  const scrollAreaRef = useRef(null)
+  const addButtonRef = useRef(null)
+
+  useEffect(() => {
+    if (questions.length === 0) handleAddQuestion()
+  }, [])
+
   const handleAddQuestion = () => {
-    const newQuestion = { ...initialQuestion, id: Date.now() }
+    const hasUnsavedQuestions = questions.some((q) => editingStates[q.id]?.isEditing)
+
+    if (hasUnsavedQuestions) {
+      alert('Please save the current question before adding a new one')
+      return
+    }
+
+    const newQuestion = { ...initialQuestion, id: 'new' }
     setQuestions([...questions, newQuestion])
     setEditingStates((prev) => ({
       ...prev,
@@ -219,38 +327,18 @@ const CreateExam = () => {
         isEditing: true
       }
     }))
-    // setTimeout(() => {
-    //   addButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    // }, 0)
-  }
 
-  useEffect(() => {
-    if (questions.length === 0) handleAddQuestion()
-  }, [])
-
-  const handleCreateExam = () => {
-    if (questions.length === 0) {
-      alert('Please add at least one question before creating the exam')
-      return
-    }
-
-    const hasUnsavedQuestions = questions.some((q) => editingStates[q.id]?.isEditing)
-
-    if (hasUnsavedQuestions) {
-      alert('Please save all questions before creating the exam')
-      return
-    }
-
-    const finalQuestions = questions.map((q) => ({
-      id: q.id,
-      questionText: q.questionText,
-      questionType: q.questionType,
-      choices: q.questionType === 'multipleChoice' ? q.choices : [],
-      answer: q.questionType === 'multipleChoice' ? q.choices[parseInt(q.answer)] : q.shortAnswer
-    }))
-
-    console.log('Exam Questions:', finalQuestions)
-    alert('Exam created successfully')
+    setTimeout(() => {
+      if (scrollAreaRef.current) {
+        const scrollContainer = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]')
+        if (scrollContainer) {
+          scrollContainer.scrollTo({
+            top: scrollContainer.scrollHeight,
+            behavior: 'smooth'
+          })
+        }
+      }
+    }, 100)
   }
 
   const handleDeleteQuestion = (index) => {
@@ -282,6 +370,13 @@ const CreateExam = () => {
     }
   }
 
+  const handleValidationErrors = (questionId, validationErrors) => {
+    setErrors((prev) => ({
+      ...prev,
+      [questionId]: validationErrors
+    }))
+  }
+
   const validateQuestion = (question) => {
     const newErrors = {}
 
@@ -292,13 +387,12 @@ const CreateExam = () => {
     if (question.questionType === 'multipleChoice') {
       if (question.answer === '') {
         newErrors.answer = 'Please select an answer'
+        return newErrors
       }
       if (question.choices.some((choice) => !choice.trim())) {
-        newErrors.choices = 'Options cannot be empty'
+        newErrors.choices = 'All options must be filled'
       }
-    }
-
-    if (question.questionType === 'shortQuestion') {
+    } else if (question.questionType === 'shortQuestion') {
       if (!question.shortAnswer?.trim()) {
         newErrors.shortAnswer = 'Answer is required'
       }
@@ -356,180 +450,43 @@ const CreateExam = () => {
 
   return (
     <div className='w-full mx-auto'>
-      {/* <div className='container items-center justify-start mx-auto w-full'>
-        <Card className='w-full'>
-          <CardHeader>
-            <div className='flex justify-between items-center'>
-              <div>
-                <CardTitle className='text-3xl'>{quizConfig.title}</CardTitle>
-                <CardDescription className='mt-2'>{quizConfig.description}</CardDescription>
-              </div>
+      <ScrollArea
+        ref={scrollAreaRef}
+        className='container flex flex-col gap-2 items-start justify-center mx-auto w-full h-[calc(100vh-200px)] py-3'
+      >
+        <div className='min-h-full relative'>
+          {questions.map((originalQuestion, index) => {
+            const question = getQuestionDisplayData(originalQuestion)
+            const questionErrors = errors[question.id] || {}
 
-              <Dialog
-                onOpenChange={(e) => {
-                  if (e) {
-                    setQuizConfigDisplay(quizConfig)
-                  }
-                }}
-              >
-                <DialogTrigger asChild>
-                  <Button variant='outline' size='icon'>
-                    <Pencil className='h-4 w-4' />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className='sm:max-w-[425px]'>
-                  <DialogHeader>
-                    <DialogTitle>Quiz Configuration</DialogTitle>
-                  </DialogHeader>
-                  <div className='grid gap-4 py-4'>
-                    <div className='grid grid-cols-4 items-center gap-4'>
-                      <Label htmlFor='title' className='text-right'>
-                        Title
-                      </Label>
-                      <Input
-                        id='title'
-                        className='col-span-3'
-                        value={quizConfigDisplay.title}
-                        onChange={(e) => setQuizConfigDisplay({ ...quizConfigDisplay, title: e.target.value })}
-                      />
-                    </div>
+            return (
+              <QuestionItem
+                key={question.id}
+                question={question}
+                originalQuestion={originalQuestion}
+                questionErrors={questionErrors}
+                questionIndex={index}
+                questionNumber={index + 1}
+                onQuestionChange={handleQuestionChange}
+                onToggleEdit={toggleEditMode}
+                onDelete={handleDeleteQuestion}
+                onValidationErrors={handleValidationErrors}
+                setRefresh={setRefresh}
+                exam_id={exam_id}
+              />
+            )
+          })}
 
-                    <div className='grid grid-cols-4 items-center gap-4'>
-                      <Label htmlFor='passcode' className='text-right'>
-                        Passcode
-                      </Label>
-                      <Input
-                        id='passcode'
-                        type='password'
-                        className='col-span-3'
-                        value={quizConfigDisplay.passcode}
-                        onChange={(e) => setQuizConfigDisplay({ ...quizConfigDisplay, passcode: e.target.value })}
-                      />
-                    </div>
-
-                    <div className='grid grid-cols-4 items-center gap-4'>
-                      <Label htmlFor='start' className='text-right'>
-                        Start Time
-                      </Label>
-                      <Input
-                        id='start'
-                        type='datetime-local'
-                        className='col-span-3'
-                        value={quizConfigDisplay.startTime.toISOString().slice(0, 16)}
-                        onChange={(e) =>
-                          setQuizConfigDisplay({
-                            ...quizConfigDisplay,
-                            startTime: new Date(e.target.value)
-                          })
-                        }
-                      />
-                    </div>
-
-                    <div className='grid grid-cols-4 items-center gap-4'>
-                      <Label htmlFor='end' className='text-right'>
-                        End Time
-                      </Label>
-                      <Input
-                        id='end'
-                        type='datetime-local'
-                        className='col-span-3'
-                        value={quizConfigDisplay.endTime.toISOString().slice(0, 16)}
-                        onChange={(e) =>
-                          setQuizConfigDisplay({
-                            ...quizConfigDisplay,
-                            endTime: new Date(e.target.value)
-                          })
-                        }
-                      />
-                    </div>
-
-                    <div className='grid grid-cols-4 items-center gap-4'>
-                      <Label htmlFor='duration' className='text-right'>
-                        Duration (minutes)
-                      </Label>
-                      <Input
-                        id='duration'
-                        type='number'
-                        className='col-span-3'
-                        value={quizConfigDisplay.duration}
-                        onChange={(e) => {
-                          setQuizConfigDisplay({
-                            ...quizConfigDisplay,
-                            duration: parseInt(e.target.value)
-                          })
-                        }}
-                      />
-                    </div>
-
-                    <div className='grid grid-cols-4 items-center gap-4'>
-                      <Label htmlFor='description' className='text-right'>
-                        Description
-                      </Label>
-                      <Textarea
-                        id='description'
-                        className='col-span-3'
-                        value={quizConfigDisplay.description}
-                        onChange={(e) => setQuizConfigDisplay({ ...quizConfigDisplay, description: e.target.value })}
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button
-                        type='button'
-                        onClick={() => {
-                          setQuizConfig({
-                            ...quizConfigDisplay,
-                            title: quizConfigDisplay.title.trim(),
-                            description: quizConfigDisplay.description.trim()
-                          })
-                        }}
-                      >
-                        Save changes
-                      </Button>
-                    </DialogClose>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+          <div className='sticky bottom-0 w-full bg-white py-4' ref={addButtonRef}>
+            <div className='w-full flex justify-center gap-4'>
+              <Button onClick={handleAddQuestion} className='gap-2 border border-gray-500' size='lg' variant='outline'>
+                <Plus className='w-4 h-4' />
+                Add question
+              </Button>
             </div>
-          </CardHeader>
-        </Card>
-      </div> */}
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <ScrollArea className='container flex flex-col gap-2 items-start justify-center mx-auto w-full h-[80vh] py-3'>
-          <SortableContext items={questions.map((q) => q.id)} strategy={verticalListSortingStrategy}>
-            {questions.map((originalQuestion, index) => {
-              const question = getQuestionDisplayData(originalQuestion)
-              const questionErrors = errors[question.id] || {}
-
-              return (
-                <SortableQuestion
-                  key={question.id}
-                  question={question}
-                  originalQuestion={originalQuestion}
-                  questionErrors={questionErrors}
-                  questionIndex={index}
-                  questionNumber={index + 1}
-                  onQuestionChange={handleQuestionChange}
-                  onToggleEdit={toggleEditMode}
-                  onDelete={handleDeleteQuestion}
-                />
-              )
-            })}
-          </SortableContext>
-
-          <div className='w-full flex justify-center gap-4 py-4 mb-4' ref={addButtonRef}>
-            <Button onClick={handleAddQuestion} className='gap-2 border border-gray-500' size='lg' variant='outline'>
-              <Plus className='w-4 h-4' />
-              Add question
-            </Button>
-            <Button onClick={handleCreateExam} className='gap-2' size='lg'>
-              <Save className='w-4 h-4' />
-              Create exam
-            </Button>
           </div>
-        </ScrollArea>
-      </DndContext>
+        </div>
+      </ScrollArea>
     </div>
   )
 }

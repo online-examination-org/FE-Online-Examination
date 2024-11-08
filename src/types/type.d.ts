@@ -58,3 +58,34 @@ export interface ExamResult {
   startedAt: string
   finishedAt: string
 }
+
+export interface Question {
+  questionId: number
+  examId: number
+  questionText: string
+  questionType: string
+  answer: string
+  choices: {
+    [key: string]: string
+  }
+}
+
+export interface CreateQuestionBody {
+  exam_id: number
+  questionText: string
+  questionType: string
+  answer: string
+  choices: {
+    [key: string]: string
+  }
+}
+
+export interface EditQuestionBody {
+  //exam_id: number
+  questionText: string
+  questionType: string
+  answer: string
+  choices: {
+    [key: string]: string
+  }
+}
