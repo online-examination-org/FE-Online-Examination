@@ -8,13 +8,13 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { ExamResult } from '@/types/type'
 
-interface StudentRecord {
-  id: string
-  name: string
-  score: number
-  completionTime: string
-  submittedAt: string
-}
+// interface StudentRecord {
+//   id: string
+//   name: string
+//   score: number
+//   completionTime: string
+//   submittedAt: string
+// }
 
 interface StudentRecordTableProps {
   results: ExamResult[]

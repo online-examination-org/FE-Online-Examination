@@ -1,77 +1,45 @@
-import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useNavigate } from 'react-router-dom'
-
-interface TestInfo {
-  testName: string
-  testDescription: string
-  startDateTime: string
-  endDateTime: string
-  duration: string
-}
+import { useDispatch, useSelector } from 'react-redux'
+import { startQuiz } from '@/services/students.services'
+import { setQuestions } from '@/store/slices/questionSlice'
 
 export default function StartQuiz() {
-  const [testInfo, setTestInfo] = useState<TestInfo | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const { examGetResponse } = useSelector((state: any) => state.exam)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
-  useEffect(() => {
-    const fetchTestInfo = async () => {
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        const mockData: TestInfo = {
-          testName: 'Final Examination',
-          testDescription:
-            'This is the final examination for the course. Please read all instructions carefully before starting.',
-          startDateTime: '2024-03-20T09:00',
-          endDateTime: '2024-03-20T11:00',
-          duration: '120'
-        }
-        setTestInfo(mockData)
-      } catch (error) {
-        console.error('Error fetching test info:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchTestInfo()
-  }, [])
-
-  const handleStartQuiz = () => {
+  const handleStartQuiz = async () => {
     try {
+      const currentTime = new Date()
+
+      const response = await startQuiz({ examId: examGetResponse.examId, startedAt: currentTime.toISOString() })
+
+      if (response) {
+        console.log(response)
+        dispatch(setQuestions(response))
+
+        localStorage.setItem('start_time', currentTime.toISOString())
+
+        const endTime = new Date(currentTime.getTime() + examGetResponse.duration * 60 * 1000)
+        localStorage.setItem('end_time', endTime.toISOString())
+      }
+
       navigate('/do-test')
-      const startTime = new Date()
-      localStorage.setItem('start_time', startTime.toISOString())
-      const endTime = new Date(startTime.getTime() + 1 * 60 * 1000)
-      localStorage.setItem('end_time', endTime.toISOString())
     } catch (error) {
       console.error(error)
     }
   }
 
-  const formatDateTime = (dateTimeString: string) => {
-    return new Date(dateTimeString).toLocaleString('en-US', {
+  const formatDateTimeWithTimezone = (dateTimeString: any) => {
+    const date = new Date(dateTimeString)
+    const dateWithTimezone = new Date(date.getTime() + 7 * 60 * 60 * 1000)
+    return dateWithTimezone.toLocaleString('en-US', {
+      timeZone: 'Asia/Ho_Chi_Minh',
       dateStyle: 'medium',
       timeStyle: 'short'
     })
-  }
-
-  if (isLoading) {
-    return (
-      <div className='min-h-screen w-full flex items-center justify-center bg-primary-foreground'>
-        <div className='text-primary'>Loading test information...</div>
-      </div>
-    )
-  }
-
-  if (!testInfo) {
-    return (
-      <div className='min-h-screen w-full flex items-center justify-center bg-primary-foreground'>
-        <div className='text-destructive'>Error loading test information</div>
-      </div>
-    )
   }
 
   return (
@@ -89,38 +57,33 @@ export default function StartQuiz() {
             <CardTitle className='text-xl font-bold text-center'>Test Infomation</CardTitle>
           </CardHeader>
           <CardContent className='space-y-6'>
-            {/* Test Name */}
             <div className='space-y-1'>
               <h3 className='font-medium text-sm text-muted-foreground'>Test Name</h3>
-              <p className='text-lg font-semibold'>{testInfo.testName}</p>
+              <p className='text-lg font-semibold'>{examGetResponse.title}</p>
             </div>
 
-            {/* Description */}
             <div className='space-y-1'>
               <h3 className='font-medium text-sm text-muted-foreground'>Description</h3>
-              <p className='text-sm font-normal'>{testInfo.testDescription}</p>
+              <p className='text-sm font-normal'>{examGetResponse.description}</p>
             </div>
 
-            {/* Time Information */}
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div className='space-y-1'>
                 <h3 className='font-medium text-sm text-muted-foreground'>Start Time</h3>
-                <p className='text-sm'>{formatDateTime(testInfo.startDateTime)}</p>
+                <p className='text-sm'>{formatDateTimeWithTimezone(examGetResponse.startTime)}</p>
               </div>
 
               <div className='space-y-1'>
                 <h3 className='font-medium text-sm text-muted-foreground'>End Time</h3>
-                <p className='text-sm'>{formatDateTime(testInfo.endDateTime)}</p>
+                <p className='text-sm'>{formatDateTimeWithTimezone(examGetResponse.endTime)}</p>
               </div>
             </div>
 
-            {/* Duration */}
             <div className='space-y-1'>
               <h3 className='font-medium text-sm text-muted-foreground'>Duration</h3>
-              <p className='text-sm'>{testInfo.duration} minutes</p>
+              <p className='text-sm'>{examGetResponse.duration} minutes</p>
             </div>
 
-            {/* Start Test Button */}
             <Button className='w-full font-semibold' onClick={handleStartQuiz}>
               START TEST
             </Button>

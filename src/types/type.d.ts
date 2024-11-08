@@ -98,6 +98,21 @@ export interface JoinPayloadProps {
 }
 
 interface SubmitQuizProps {
-  exam_result_id: string
   finish_at: string
+}
+
+interface JoinQuizProps {
+  passcode: string
+  studentId: string
+  name: string
+  email: string
+}
+
+interface StartQuizProps {
+  startedAt: string
+}
+
+interface saveQuizProps {
+  question_id: number
+  response: string
 }

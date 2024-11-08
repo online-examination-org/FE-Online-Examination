@@ -8,6 +8,10 @@ import * as yup from 'yup'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import PillInput from '@/components/ui/input-custom'
 import { useEffect } from 'react'
+import { joinQuiz } from '@/services/students.services'
+import { useDispatch } from 'react-redux'
+import { setExamData } from '@/store/slices/examSlice'
+import { useToast } from '@/hooks/use-toast'
 
 const schema = yup
   .object({
@@ -15,7 +19,7 @@ const schema = yup
       .string()
       .required('Student ID is required')
       .matches(/^[0-9]+$/, 'Student ID must contain only numbers'),
-    fullName: yup
+    name: yup
       .string()
       .required('Full name is required')
       .min(2, 'Full name must be at least 2 characters')
@@ -37,15 +41,16 @@ export default function JoinQuiz() {
   } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: {
-      studentId: '',
-      fullName: '',
+      passcode: '',
+      name: '',
       email: '',
-      passcode: ''
+      studentId: ''
     }
   })
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-
+  const dispatch = useDispatch()
+  const { toast } = useToast()
   useEffect(() => {
     const passcodeParam = searchParams.get('passcode')
     if (passcodeParam) {
@@ -57,12 +62,19 @@ export default function JoinQuiz() {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000))
       console.log('Form submitted:', JSON.stringify(data, null, 2))
-
+      const response = await joinQuiz(data)
       // set student token
-      localStorage.setItem('st_access_token', '')
+
+      if (response) {
+        console.log(response)
+        localStorage.setItem('st_access_token', response?.examResultToken)
+        localStorage.setItem('exam_id', response?.examGetResponse?.examId)
+        dispatch(setExamData(response))
+        toast({ description: 'Join test successfully' })
+      }
 
       // reset()
-      // navigate('/start')
+      navigate('/start')
     } catch (error) {
       console.error('Error submitting form:', error)
     }
@@ -106,10 +118,10 @@ export default function JoinQuiz() {
                 />
                 <PillInput
                   label='Full Name'
-                  id='fullName'
-                  type='fullName'
-                  placeholder='Enter your fullName'
-                  register={register('fullName')}
+                  id='name'
+                  type='name'
+                  placeholder='Enter your name'
+                  register={register('name')}
                   error={errors.fullName?.message}
                   disabled={isSubmitting}
                 />

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Copy, CalendarClock } from 'lucide-react'
+import { Copy } from 'lucide-react'
 import QRCode from 'react-qr-code'
 import { format } from 'date-fns'
 import { useToast } from '@/hooks/use-toast'
