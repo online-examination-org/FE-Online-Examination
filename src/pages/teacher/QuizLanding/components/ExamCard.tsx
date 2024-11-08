@@ -8,9 +8,10 @@ import { formatDateTime } from '@/utils/date'
 
 interface ExamCardProps {
   exam: Exam
+  onDeleteExam: (examId: number) => void
 }
 
-const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
+const ExamCard: React.FC<ExamCardProps> = ({ exam, onDeleteExam }) => {
   return (
     <Card className='relative overflow-hidden bg-white hover:shadow-lg transition-all duration-300 transform hover:scale-105 rounded-lg'>
       {/* Background Image with Gradient Overlay */}
@@ -38,10 +39,10 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
         <CardDescription>
           <div className='text-sm text-gray-800 mt-2 px-3 flex flex-col gap-1'>
             <p>
-              <strong>Start:</strong> {formatDateTime(exam.start_time)}
+              <strong>Start:</strong> {formatDateTime(exam.startTime)}
             </p>
             <p>
-              <strong>End:</strong> {formatDateTime(exam.end_time)}
+              <strong>End:</strong> {formatDateTime(exam.endTime)}
             </p>
             <p>
               <strong>Duration:</strong> {exam.duration} minutes
@@ -52,7 +53,7 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
 
       {/* Card Footer */}
       <CardFooter className='mt-32 px-3 w-full flex items-center justify-between'>
-        <Link to={`/quiz/${exam.exam_id}`} className='w-4/5'>
+        <Link to={`/quiz/${exam.examId}`} className='w-4/5'>
           <Button className='w-full bg-violet-950 hover:bg-violet-800 text-white font-semibold transition-all duration-200'>
             View detail
           </Button>
@@ -61,6 +62,7 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam }) => {
           className='w-1/5 cursor-pointer text-muted-foreground hover:text-red-600 bg-white rounded-sm flex items-center justify-center transition-all duration-200'
           aria-label='Delete Exam'
           title='Delete Exam'
+          onClick={() => onDeleteExam(exam.examId)}
         >
           <Trash className='text-violet-950 hover:text-violet-800' />
         </button>

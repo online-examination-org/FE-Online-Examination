@@ -32,8 +32,8 @@ function Header() {
         setProfile(response.data)
       } catch (err) {
         console.error(err)
-        localStorage.removeItem('access_token')
-        navigate('/login')
+        //localStorage.removeItem('access_token')
+        //navigate('/login')
       }
     }
     fetchProfile()

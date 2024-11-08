@@ -3,13 +3,69 @@ import { useParams } from 'react-router-dom'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import CreateExam from './components/CreateExam'
 import StudentRecordTable from './components/StudentRecordTable'
-import { useSelector } from 'react-redux'
 import ExamDetails from './components/ExamDetails'
+import { getExamResults } from '@/services/examResults.services'
+import { useEffect, useState } from 'react'
+import { Exam, Question } from '@/types/type'
+import { getExams } from '@/services/teachers.services'
+import { getQuestions } from '@/services/questions.services'
 
 const QuizBoard: React.FC = () => {
-  const user = useSelector((state: any) => state.user)
   const { id } = useParams()
-  console.log(id, user)
+  const [results, setResults] = useState([])
+
+  const [exam, setExam] = useState<Exam | null>(null)
+  const [questions, setQuestions] = useState<Question[]>([])
+  const [refresh, setRefesh] = useState(true)
+
+  const fetchExam = async () => {
+    try {
+      const response = await getExams()
+      console.log(response.data)
+      setExam(response.data.find((exam) => exam.examId === parseInt(id as string)) || null)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const fetchResults = async () => {
+    try {
+      const response = await getExamResults(id as string)
+      setResults(response.data || [])
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  const fetchQuestions = async () => {
+    try {
+      const response = await getQuestions(id as string)
+      const mappedQuestions: Question[] = response.data.map((item: any) => ({
+        questionId: item.questionId,
+        examId: item.exam.examId,
+        questionText: item.questionText,
+        questionType: item.questionType,
+        answer: item.answer,
+        choices: item.choices || {} // Handle null case by providing empty object as default
+      }))
+      setQuestions(mappedQuestions)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  useEffect(() => {
+    if (id) {
+      fetchExam()
+      fetchResults()
+    }
+  }, [id])
+
+  useEffect(() => {
+    if (id) {
+      fetchQuestions()
+    }
+  }, [id, refresh])
 
   return (
     <div className='bg-primary-foreground h-[calc(100vh-56px)] overflow-hidden'>
@@ -32,13 +88,13 @@ const QuizBoard: React.FC = () => {
           </TabsList>
 
           <TabsContent value='general'>
-            <ExamDetails />
+            <ExamDetails exam={exam} />
           </TabsContent>
           <TabsContent value='result'>
-            <StudentRecordTable />
+            <StudentRecordTable results={results} />
           </TabsContent>
           <TabsContent value='question'>
-            <CreateExam />
+            <CreateExam questions={questions} setRefresh={() => setRefesh(!refresh)} exam_id={id as string} />
           </TabsContent>
         </Tabs>
       </div>

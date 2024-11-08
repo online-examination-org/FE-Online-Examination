@@ -1,4 +1,3 @@
-import React from 'react'
 import { useForm } from 'react-hook-form'
 import ExamCard from '@/pages/teacher/QuizLanding/components/ExamCard'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -8,8 +7,13 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useState, useEffect } from 'react'
-import { Exam } from '@/types/type'
+import { CreateExamBody, Exam } from '@/types/type'
+import { getExams } from '@/services/teachers.services'
+import { useToast } from '@/hooks/use-toast'
+import { createExam, deleteExam } from '@/services/exams.services'
+import { useExams } from '@/contexts/ExamsContext'
 
 function QuizLanding() {
   const [open, setOpen] = useState(false)
@@ -17,6 +21,65 @@ function QuizLanding() {
   const [startDateFilter, setStartDateFilter] = useState('')
   const [endDateFilter, setEndDateFilter] = useState('')
   const [examsDisplay, setExamsDisplay] = useState<Exam[]>([])
+  //const [exams, setExams] = useState<Exam[]>([])
+  const [loading, setLoading] = useState(true)
+  const [refresh, setRefresh] = useState(true)
+
+  const { toast } = useToast()
+
+  const { exams, setExams } = useExams()
+
+  // Hàm chuyển đổi giờ UTC sang UTC+7
+  const convertToVietnamTime = (date: Date) => {
+    return new Date(date.getTime() + 7 * 60 * 60 * 1000)
+  }
+
+  const onCreateNewExam = async (payload: CreateExamBody) => {
+    try {
+      const response = await createExam(payload)
+      console.log(response)
+      setRefresh(!refresh)
+    } catch (err) {
+      console.log(err)
+      toast({ description: 'Failed to create new exam', variant: 'destructive' })
+    }
+  }
+
+  const onDeleteExam = async (examId: number) => {
+    try {
+      const response = await deleteExam(examId)
+      console.log(response)
+      setRefresh(!refresh)
+    } catch (err) {
+      console.log(err)
+      toast({ description: 'Failed to delete exam', variant: 'destructive' })
+    }
+  }
+
+  // Hàm chuyển đổi từ chuỗi datetime-local sang Date với múi giờ Việt Nam
+  const parseLocalDateTime = (dateTimeStr: string) => {
+    if (!dateTimeStr) return null
+    const date = new Date(dateTimeStr)
+    return convertToVietnamTime(date)
+  }
+
+  useEffect(() => {
+    const fetchExams = async () => {
+      try {
+        const response = await getExams()
+        setExams(response.data)
+        setLoading(false)
+        console.log(response)
+      } catch (err) {
+        console.log(err)
+        setLoading(false)
+      }
+    }
+    fetchExams()
+  }, [refresh])
+
+  const defaultStartTime = convertToVietnamTime(new Date()).toISOString().slice(0, 16)
+  const defaultEndTime = convertToVietnamTime(new Date()).toISOString().slice(0, 16)
 
   const {
     register,
@@ -26,54 +89,23 @@ function QuizLanding() {
   } = useForm({
     defaultValues: {
       title: '',
-      startTime: new Date(new Date().getTime() + 7 * 60 * 60 * 1000).toISOString().slice(0, 16),
-      endTime: new Date(new Date().getTime() + 7 * 60 * 60 * 1000).toISOString().slice(0, 16),
+      startTime: defaultStartTime,
+      endTime: defaultEndTime,
       duration: 30,
       description: ''
     }
   })
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data: CreateExamBody) => {
     console.log(data)
+    await onCreateNewExam({
+      ...data,
+      startTime: new Date(data.startTime).toISOString(),
+      endTime: new Date(data.endTime).toISOString()
+    })
     setOpen(false)
     reset()
   }
-
-  const exams: Exam[] = [
-    {
-      exam_id: 1,
-      teacher_id: 101,
-      title: 'Math Midterm',
-      passcode: 'MATH123',
-      start_time: '2024-11-10T09:00:00',
-      end_time: '2024-11-10T10:30:00',
-      duration: 90,
-      create_at: 1730217000,
-      description: 'Midterm exam covering algebra and calculus.'
-    },
-    {
-      exam_id: 2,
-      teacher_id: 123,
-      title: 'Test',
-      passcode: '123A123',
-      start_time: '2024-10-30T11:30:15',
-      end_time: '2024-10-30T11:45:15',
-      duration: 15,
-      create_at: 1730217888,
-      description: 'final'
-    },
-    {
-      exam_id: 3,
-      teacher_id: 102,
-      title: 'Physics Final',
-      passcode: 'PHY321',
-      start_time: '2024-12-15T13:00:00',
-      end_time: '2024-12-15T15:00:00',
-      duration: 120,
-      create_at: 1730219000,
-      description: 'Comprehensive final covering entire syllabus.'
-    }
-  ]
 
   useEffect(() => {
     let filteredExams = [...exams]
@@ -85,15 +117,41 @@ function QuizLanding() {
 
     // Date range filter
     if (startDateFilter) {
-      filteredExams = filteredExams.filter((exam) => new Date(exam.start_time) >= new Date(startDateFilter))
+      const startDate = parseLocalDateTime(startDateFilter)
+      filteredExams = filteredExams.filter((exam) => {
+        const examStartTime = convertToVietnamTime(new Date(exam.startTime))
+        return startDate ? examStartTime >= startDate : true
+      })
     }
 
     if (endDateFilter) {
-      filteredExams = filteredExams.filter((exam) => new Date(exam.end_time) <= new Date(endDateFilter))
+      const endDate = parseLocalDateTime(endDateFilter)
+      filteredExams = filteredExams.filter((exam) => {
+        const examEndTime = convertToVietnamTime(new Date(exam.endTime))
+        return endDate ? examEndTime <= endDate : true
+      })
     }
 
     setExamsDisplay(filteredExams)
   }, [searchTerm, startDateFilter, endDateFilter, exams])
+
+  const ExamCardSkeleton = () => (
+    <Card className='min-h-[271px] relative overflow-hidden'>
+      <Skeleton className='h-[82px] w-full' />
+      <CardHeader className='absolute top-14 left-0 right-0 p-3'>
+        <CardTitle>
+          <Skeleton className='h-12 w-full rounded' />
+        </CardTitle>
+        <CardDescription>
+          <div className='space-y-2'>
+            <Skeleton className='h-4 w-3/4' />
+            <Skeleton className='h-4 w-1/2' />
+            <Skeleton className='h-20 w-1/4 mx-auto mt-4' />
+          </div>
+        </CardDescription>
+      </CardHeader>
+    </Card>
+  )
 
   return (
     <div className='bg-primary-foreground h-[calc(100vh-56px)] overflow-hidden'>
@@ -132,7 +190,7 @@ function QuizLanding() {
           <div className='grid grid-cols-4 gap-4 p-3'>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Card className='min-h-[271px] relative overflow-hidden bg-white hover:shadow-lg transition-all duration-300 transform hover:scale-105 rounded-lg'>
+                <Card className='cursor-pointer min-h-[271px] relative overflow-hidden bg-white hover:shadow-lg transition-all duration-300 transform hover:scale-105 rounded-lg'>
                   <div
                     className='h-[82px] w-full bg-cover bg-center relative'
                     style={{
@@ -268,9 +326,11 @@ function QuizLanding() {
                 </form>
               </DialogContent>
             </Dialog>
-            {examsDisplay.map((exam) => (
-              <ExamCard key={exam.exam_id} exam={exam} />
-            ))}
+
+            {loading
+              ? // Show 8 skeleton cards while loading
+                [...Array(8)].map((_, index) => <ExamCardSkeleton key={index} />)
+              : examsDisplay.map((exam) => <ExamCard key={exam.examId} exam={exam} onDeleteExam={onDeleteExam} />)}
           </div>
         </ScrollArea>
       </div>

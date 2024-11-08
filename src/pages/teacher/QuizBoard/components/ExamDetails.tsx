@@ -4,39 +4,17 @@ import { Copy, CalendarClock } from 'lucide-react'
 import QRCode from 'react-qr-code'
 import { format } from 'date-fns'
 import { useToast } from '@/hooks/use-toast'
+import { Exam } from '@/types/type'
 
-// interface ExamProps {
-//   exam: {
-//     exam_id: number
-//     teacher_id: number
-//     title: string
-//     passcode: string
-//     start_time: string
-//     end_time: string
-//     duration: number
-//     create_at: number
-//     description: string
-//   }
-// }
-
-const exam = {
-  exam_id: 1,
-  teacher_id: 1,
-  title: 'Bài kiểm tra cuối kỳ môn Toán lớp 12',
-  passcode: 'ABC123',
-  start_time: '2024-03-20T09:00:00Z',
-  end_time: '2024-03-20T11:00:00Z',
-  duration: 120,
-  create_at: 1710921600,
-  description:
-    'Bài kiểm tra cuối kỳ cho môn Toán lớp 12, bao gồm các kiến thức về đạo hàm, tích phân, và hình học không gian.'
+interface ExamProps {
+  exam: Exam | null
 }
 
-const ExamDetails = () => {
+const ExamDetails: React.FC<ExamProps> = ({ exam }) => {
   const { toast } = useToast()
   const handleCopyPasscode = async () => {
     try {
-      await navigator.clipboard.writeText(exam.passcode)
+      await navigator.clipboard.writeText(exam?.passcode || '')
       toast({ description: 'Passcode copied successfully' })
     } catch (err) {
       console.error('Failed to copy passcode:', err)
@@ -45,7 +23,7 @@ const ExamDetails = () => {
   }
 
   // Tạo URL cho QR code (ví dụ: domain của bạn + exam_id)
-  const qrValue = `http://localhost:3000/join?passcode=${exam.passcode}`
+  const qrValue = `http://localhost:3000/join?passcode=${exam?.passcode || ''}`
 
   // Format dates
   const formatDateTime = (isoString: string) => {
@@ -56,7 +34,7 @@ const ExamDetails = () => {
     <div className='w-full mx-auto px-2'>
       <Card className='rounded-md'>
         <CardHeader>
-          <CardTitle className='text-2xl font-bold'>{exam.title}</CardTitle>
+          <CardTitle className='text-2xl font-bold'>{exam?.title || ''}</CardTitle>
         </CardHeader>
         <CardContent className='space-y-6 grid grid-cols-12'>
           {/* Thông tin thời gian */}
@@ -67,14 +45,14 @@ const ExamDetails = () => {
                   {/* <CalendarClock className='w-5 h-5 text-gray-500' /> */}
                   <div className='space-y-1'>
                     <p className='text-sm text-gray-500'>Duration</p>
-                    <p className='font-medium'>{exam.duration} minutes</p>
+                    <p className='font-medium'>{exam?.duration || 0} minutes</p>
                   </div>
                 </div>
                 <div className='space-y-4'>
                   <div>
                     <p className='text-sm text-gray-500 mb-1'>Passcode</p>
                     <div className='flex items-center gap-2'>
-                      <code className='bg-gray-100 px-4 py-2 rounded-lg font-mono text-lg'>{exam.passcode}</code>
+                      <code className='bg-gray-100 px-4 py-2 rounded-lg font-mono text-lg'>{exam?.passcode || ''}</code>
                       <Button variant='outline' size='icon' onClick={handleCopyPasscode} className='flex-shrink-0'>
                         <Copy className='h-4 w-4' />
                       </Button>
@@ -83,15 +61,15 @@ const ExamDetails = () => {
                 </div>
                 <div>
                   <p className='text-sm text-gray-500'>Start time</p>
-                  <p className='font-medium'>{formatDateTime(exam.start_time)}</p>
+                  <p className='font-medium'>{formatDateTime(exam?.startTime || new Date().toISOString())}</p>
                 </div>
                 <div>
                   <p className='text-sm text-gray-500'>End time</p>
-                  <p className='font-medium'>{formatDateTime(exam.end_time)}</p>
+                  <p className='font-medium'>{formatDateTime(exam?.endTime || new Date().toISOString())}</p>
                 </div>
                 <div className='w-full col-span-2'>
                   <h3 className='font-semibold mb-2'>Description</h3>
-                  <p className='text-gray-600 whitespace-pre-wrap'>{exam.description}</p>
+                  <p className='text-gray-600 whitespace-pre-wrap'>{exam?.description || ''}</p>
                 </div>
               </div>
             </div>
