@@ -33,7 +33,7 @@ function App() {
 
           <Route element={<StudentRoutes />}>
             <Route path='/start' element={<StartQuiz />} />
-            <Route path='/make-quiz' element={<MakeQuiz />} />
+            <Route path='/do-test' element={<MakeQuiz />} />
             <Route path='/completed' element={<TestCompletion />} />
           </Route>
 

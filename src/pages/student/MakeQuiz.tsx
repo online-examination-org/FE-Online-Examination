@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
@@ -7,8 +8,8 @@ import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { ChevronLeft, ChevronRight, Send, Clock, LayoutGrid, List } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
-import quizData from '../../dummy_datas/quiz_data.json'
 import { useNavigate } from 'react-router-dom'
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,57 +20,39 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-export interface Question {
-  id: number
-  question: string
-  type: 'multipleChoice' | 'shortQuestion'
-  options?: string[]
-  required: boolean
-}
+import { updateQuestionResponse } from '@/store/slices/questionSlice'
+import { saveQuizProps } from '@/types/type'
+import { saveQuiz, submitQuiz } from '@/services/students.services'
+import { useToast } from '@/hooks/use-toast'
 
-export interface QuizProps {
-  title: string
-  description: string
-  timeLimit: number
-  questions: Question[]
-}
-
-interface Answers {
-  [key: number]: string
-}
-
-// interface MakeQuizProps {
-//   quiz?: QuizProps
-//   onSubmit?: (answers: Answers) => void
-// }
-
-interface SubmissionData {
-  timestamp: string
-  quizTitle: string
-  answers: Answers
-  timeSpent: number
+interface Question {
+  questionId: number
+  questionText: string
+  questionType: 'multipleChoice' | 'shortQuestion'
+  choices?: {
+    [key: string]: string
+  }
+  examResultDetailId: number | null
+  response: string | null
 }
 
 const MakeQuiz = () => {
+  const dispatch = useDispatch()
+  const questions = useSelector((state: any) => state.questions.questions)
+  const exam = useSelector((state: any) => state.exam)
   const questionRefs = useRef<(HTMLDivElement | null)[]>([])
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0)
-  const [answers, setAnswers] = useState<Answers>({})
-  const [timeRemaining, setTimeRemaining] = useState<number>(quizData.quiz.timeLimit * 60)
-  // const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  const [timeRemaining, setTimeRemaining] = useState<number>(() => {
+    const endTime = localStorage.getItem('end_time')
+    return endTime ? Math.floor((new Date(endTime).getTime() - new Date().getTime()) / 1000) : 3600 // Default 1 hour
+  })
+  const [localTextAnswers, setLocalTextAnswers] = useState<{ [key: number]: string }>({})
   const [showAlert, setShowAlert] = useState<boolean>(false)
   const [alertMessage, setAlertMessage] = useState<string>('')
   const [viewMode, setViewMode] = useState<'card' | 'list'>('list')
   const [showSubmitDialog, setShowSubmitDialog] = useState(false)
-  const [exam, setExam] = useState<any>()
   const navigate = useNavigate()
-  const questions = quizData.quiz.questions
-
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      setExam(quizData.quiz)
-    }
-    fetchQuestions()
-  })
+  const toast = useToast()
 
   // Timer effect
   useEffect(() => {
@@ -87,18 +70,6 @@ const MakeQuiz = () => {
     return () => clearInterval(timer)
   }, [])
 
-  // Auto-save effect
-  useEffect(() => {
-    const savedAnswers = localStorage.getItem('quizAnswers')
-    if (savedAnswers) {
-      setAnswers(JSON.parse(savedAnswers))
-    }
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem('quizAnswers', JSON.stringify(answers))
-  }, [answers])
-
   // Helper functions
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60)
@@ -106,8 +77,53 @@ const MakeQuiz = () => {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
   }
 
+  const handleMultipleChoiceAnswer = async (value: string, questionId: number): Promise<void> => {
+    try {
+      dispatch(updateQuestionResponse({ questionId, response: value }))
+
+      const payload: saveQuizProps = {
+        question_id: questionId,
+        response: value
+      }
+
+      await saveQuiz(payload)
+    } catch (error) {
+      console.error('Failed to save answer:', error)
+      dispatch(updateQuestionResponse({ questionId, response: null }))
+      // toast.toast({ description: 'Failed to save your answer', variant: 'destructive' })
+    }
+  }
+
+  // Handle text answer changes - local state only
+  const handleTextChange = (value: string, questionId: number) => {
+    setLocalTextAnswers((prev) => ({ ...prev, [questionId]: value }))
+    // Update Redux for UI consistency, but don't save to API yet
+    dispatch(updateQuestionResponse({ questionId, response: value }))
+  }
+
+  // Handle text answer blur - save to API
+  const handleTextBlur = async (questionId: number) => {
+    const value = localTextAnswers[questionId]
+    if (value === undefined) return
+
+    try {
+      const payload: saveQuizProps = {
+        question_id: questionId,
+        response: value
+      }
+
+      await saveQuiz(payload)
+      toast.toast({
+        description: 'Answer saved successfully',
+        variant: 'default'
+      })
+    } catch (error) {
+      console.error('Failed to save answer:', error)
+    }
+  }
+
   const calculateProgress = (): number => {
-    const answeredQuestions = Object.keys(answers).length
+    const answeredQuestions = questions.filter((q: any) => q.response !== null).length
     return (answeredQuestions / questions.length) * 100
   }
 
@@ -117,31 +133,16 @@ const MakeQuiz = () => {
     handleSubmit()
   }
 
-  // const showMessage = (message: string): void => {
-  //   setAlertMessage(message)
-  //   setShowAlert(true)
-  //   setTimeout(() => setShowAlert(false), 3000)
-  // }
-
-  // Event handlers
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleAnswer = (value: string, question_id: any = null): void => {
-    setAnswers((prev) => ({
-      ...prev,
-      [question_id]: value
-    }))
-  }
-
   const handleSubmit = async () => {
-    const submissionData: SubmissionData = {
-      timestamp: new Date().toISOString(),
-      quizTitle: exam.title,
-      timeSpent: exam.timeLimit * 60 - timeRemaining,
-      answers
+    try {
+      const res = await submitQuiz({ finish_at: new Date().toISOString() })
+      if (res) console.log(res)
+      localStorage.setItem('finish_at', new Date().toISOString())
+      navigate('/completed')
+      toast.toast({ description: 'Submit Exam successfully' })
+    } catch (error) {
+      console.log(error)
     }
-    localStorage.removeItem('quizAnswers')
-    console.log('Submitting answers:', submissionData)
-    navigate('/completed')
   }
 
   const handleNext = (): void => {
@@ -162,7 +163,8 @@ const MakeQuiz = () => {
   }
 
   const isQuestionAnswered = (questionId: number): boolean => {
-    return !!answers[questionId]
+    const question = questions.find((q: any) => q.questionId === questionId)
+    return question?.response !== null
   }
 
   const ViewToggle = () => (
@@ -180,7 +182,6 @@ const MakeQuiz = () => {
 
   const QuizPanels = () => (
     <div className='w-1/4 p-4 border sticky top-2 flex-grow rounded-lg'>
-      {/* Progress bar */}
       <div className='space-y-2 mb-5'>
         <div className='flex justify-between text-sm text-gray-500'>
           <span>Progress</span>
@@ -189,21 +190,19 @@ const MakeQuiz = () => {
         <Progress value={calculateProgress()} className='w-full' />
       </div>
 
-      {/* Question Navigation */}
       <div className='flex flex-wrap gap-2 mb-6'>
-        {questions.map((question) => (
+        {questions.map((question: any, index: any) => (
           <Button
-            key={question.id}
-            variant={currentQuestionIndex === question.id ? 'default' : 'outline'}
-            className={`w-10 h-10 relative ${isQuestionAnswered(question.id) ? 'bg-green-200' : ''}`}
-            onClick={() => goToQuestion(question.id)}
+            key={question.questionId}
+            variant={currentQuestionIndex === index ? 'default' : 'outline'}
+            className={`w-10 h-10 relative ${isQuestionAnswered(question.questionId) ? 'bg-green-200' : ''}`}
+            onClick={() => goToQuestion(index)}
           >
-            {question.id + 1}
-            {question.required && <span className='absolute -top-1 -right-1 text-red-500 text-xs'>*</span>}
+            {index + 1}
           </Button>
         ))}
       </div>
-      {/* Quiz Timer */}
+
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-2 text-lg'>
           <Clock className='w-5 h-5' />
@@ -216,6 +215,54 @@ const MakeQuiz = () => {
       </div>
     </div>
   )
+
+  const renderQuestion = (question: Question, index: number) => {
+    return (
+      <div
+        className='rounded-lg mb-5 p-3 border'
+        ref={(el) => (questionRefs.current[index] = el)}
+        key={question.questionId}
+      >
+        <h3 className='text-lg font-medium mb-3'>
+          Question {index + 1}: {question.questionText}
+        </h3>
+        <div className='p-2 rounded-lg bg-white'>
+          {question.questionType === 'multipleChoice' ? (
+            <RadioGroup
+              value={question.response || ''}
+              onValueChange={(value) => handleMultipleChoiceAnswer(value, question.questionId)}
+              className='space-y-0'
+            >
+              {Object.entries(question.choices || {}).map(([key, value]) => (
+                <div
+                  key={key}
+                  className='flex items-center space-x-2 hover:bg-gray-100 h-[30px] rounded-md'
+                  onClick={() => handleMultipleChoiceAnswer(value, question.questionId)}
+                >
+                  <RadioGroupItem
+                    value={value}
+                    id={`${question.questionId}-${key}`}
+                    className={`${value === question.response ? 'bg-blue-400 text-white' : ''}`}
+                  />
+                  <Label htmlFor={`${question.questionId}-${key}`} className='font-normal cursor-pointer'>
+                    {key}. {value}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          ) : (
+            <Textarea
+              className='min-h-[100px]'
+              placeholder='Enter your answer'
+              value={localTextAnswers[question.questionId] ?? question.response ?? ''}
+              onChange={(e) => handleTextChange(e.target.value, question.questionId)}
+              onBlur={() => handleTextBlur(question.questionId)}
+            />
+          )}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className='container min-h-screen flex flex-col items-start justify-start mx-auto p-6 max-w-[1204px]'>
@@ -230,100 +277,19 @@ const MakeQuiz = () => {
       <div className='flex items-start gap-5 w-full'>
         <Card className='w-3/4 flex-grow'>
           <CardHeader>
-            <div className='flex justify-between items-center'>
-              <div>
-                <CardTitle className='text-2xl'>{exam?.title}</CardTitle>
-                <CardDescription>{exam?.description}</CardDescription>
-              </div>
-            </div>
+            <CardTitle className='text-2xl'>{exam.examGetResponse.title}</CardTitle>
+            <CardDescription>Complete all questions before submitting</CardDescription>
           </CardHeader>
 
           <CardContent className='space-y-6'>
-            {/* card view */}
-            {viewMode === 'card' && (
+            {viewMode === 'card' ? (
               <div className='space-y-4 min-h-[225px] p-3 border'>
-                <h3 className='text-lg font-medium'>
-                  Question {currentQuestionIndex + 1}: {questions[currentQuestionIndex].question}
-                  {questions[currentQuestionIndex].required && <span className='text-red-500 ml-1'>*</span>}
-                </h3>
-                <div className='p-2'>
-                  {questions[currentQuestionIndex].type === 'multipleChoice' ? (
-                    <RadioGroup
-                      value={answers[currentQuestionIndex] || ''}
-                      onValueChange={(value) => handleAnswer(value, currentQuestionIndex)}
-                      className='space-y-0'
-                    >
-                      {questions[currentQuestionIndex].options?.map((option) => (
-                        <div
-                          key={option}
-                          className='flex items-center space-x-2 hover:bg-gray-100 h-[30px] rounded-md'
-                          onClick={() => handleAnswer(option, currentQuestionIndex)}
-                        >
-                          <RadioGroupItem value={option} id={option} />
-                          <Label htmlFor={option} className='font-normal cursor-pointer'>
-                            {option}
-                          </Label>
-                        </div>
-                      ))}
-                    </RadioGroup>
-                  ) : (
-                    <Textarea
-                      className='min-h-[150px]'
-                      placeholder='Enter your answer'
-                      value={answers[currentQuestionIndex] || ''}
-                      onChange={(e) => handleAnswer(e.target.value, currentQuestionIndex)}
-                    />
-                  )}
-                </div>
+                {questions[currentQuestionIndex] &&
+                  renderQuestion(questions[currentQuestionIndex], currentQuestionIndex)}
               </div>
-            )}
-
-            {/* list view */}
-            {viewMode === 'list' && (
+            ) : (
               <div className='space-y-8'>
-                {questions.map((question) => (
-                  <div className='rounded-lg mb-5 p-3 border' ref={(el) => (questionRefs.current[question.id] = el)}>
-                    <h3 className='text-lg font-medium mb-3'>
-                      Question {question.id + 1}: {question.question}
-                      {question.required && <span className='text-red-500 ml-1'>*</span>}
-                    </h3>
-                    <div key={question.id} className={`p-2 rounded-lg bg-white`} id={`question-${question.id}`}>
-                      {question.type === 'multipleChoice' ? (
-                        <RadioGroup
-                          value={answers[question.id] || ''}
-                          onValueChange={(value) => handleAnswer(value, question.id)}
-                          className='space-y-0'
-                        >
-                          {question.options?.map((option) => (
-                            <div
-                              key={option}
-                              className='flex items-center space-x-2 hover:bg-gray-100 h-[30px] rounded-md'
-                              onClick={() => handleAnswer(option, question.id)}
-                            >
-                              <RadioGroupItem
-                                value={option}
-                                id={option}
-                                className={`${option === answers[question.id] ? 'bg-blue-400 text-white' : ''}`}
-                              />
-                              <Label htmlFor={option} className='font-normal cursor-pointer'>
-                                {option}
-                              </Label>
-                            </div>
-                          ))}
-                        </RadioGroup>
-                      ) : (
-                        <Textarea
-                          className='min-h-[100px]'
-                          placeholder='Enter your answer'
-                          value={answers[question.id] || ''}
-                          onChange={(e) => {
-                            handleAnswer(e.target.value, question.id)
-                          }}
-                        />
-                      )}
-                    </div>
-                  </div>
-                ))}
+                {questions.map((question: any, index: any) => renderQuestion(question, index))}
               </div>
             )}
           </CardContent>
@@ -357,8 +323,8 @@ const MakeQuiz = () => {
                     <span className='font-bold pr-2'>Time remaining:</span> {formatTime(timeRemaining)}
                   </div>
                   <div className='text-sm mt-2'>
-                    <span className='font-bold pr-2'>Questions answered:</span> {Object.keys(answers).length} of{' '}
-                    {questions.length}
+                    <span className='font-bold pr-2'>Questions answered:</span>{' '}
+                    {questions.filter((q: any) => q.response !== null).length} of {questions.length}
                   </div>
                   <div className='mt-4 text-sm text-muted-foreground'>
                     Note: You cannot modify your answers after submission.

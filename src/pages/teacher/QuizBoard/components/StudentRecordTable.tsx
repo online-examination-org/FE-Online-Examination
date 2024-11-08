@@ -8,13 +8,13 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { ExamResult } from '@/types/type'
 
-interface StudentRecord {
-  id: string
-  name: string
-  score: number
-  completionTime: string
-  submittedAt: string
-}
+// interface StudentRecord {
+//   id: string
+//   name: string
+//   score: number
+//   completionTime: string
+//   submittedAt: string
+// }
 
 interface StudentRecordTableProps {
   results: ExamResult[]
@@ -122,7 +122,7 @@ const StudentRecordDisplay: React.FC<StudentRecordTableProps> = ({ results }) =>
                 variant='outline'
                 size='sm'
                 className='flex items-center gap-2'
-                onClick={() => navigate(`/quiz/2/student/${student.id}`)}
+                onClick={() => navigate(`/quiz/2/student/${result.examResultId}`)}
               >
                 <Award className='h-4 w-4' />
                 View Details
