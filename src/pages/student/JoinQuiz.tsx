@@ -77,7 +77,7 @@ export default function JoinQuiz() {
   }
 
   return (
-    <div className='min-h-screen w-full flex items-start md:items-center justify-center bg-slate-100 p-4'>
+    <div className='min-h-screen w-full flex items-center justify-center bg-slate-100 p-4'>
       <div className='w-full max-w-4xl flex flex-col md:flex-row items-stretch justify-center border rounded-lg overflow-hidden bg-white'>
         {/* Background image - hidden on mobile, visible from md breakpoint */}
         <div

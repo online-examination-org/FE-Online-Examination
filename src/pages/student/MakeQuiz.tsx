@@ -253,7 +253,7 @@ const MakeQuiz = () => {
             </RadioGroup>
           ) : (
             <Textarea
-              className='min-h-[100px]'
+              className='min-h-[200px] md:min-h-[100px]'
               placeholder='Enter your answer'
               value={localTextAnswers[question.questionId] ?? question.response ?? ''}
               onChange={(e) => handleTextChange(e.target.value, question.questionId)}
@@ -266,7 +266,7 @@ const MakeQuiz = () => {
   }
 
   return (
-    <div className='container min-h-screen flex flex-col items-start justify-start mx-auto p-6 max-w-[1204px]'>
+    <div className='container min-h-screen flex flex-col items-start justify-start mx-auto p-2 md:p-6 max-w-[1204px]'>
       {showAlert && (
         <Alert className='mb-4'>
           <AlertDescription>{alertMessage}</AlertDescription>
@@ -275,16 +275,16 @@ const MakeQuiz = () => {
 
       <ViewToggle />
 
-      <div className='flex items-start gap-5 w-full flex-wrap-reverse'>
+      <div className='flex items-start gap-5 w-full flex-wrap-reverse md:flex-nowrap'>
         <Card className='w-full md:w-3/4 flex-grow'>
           <CardHeader>
             <CardTitle className='text-2xl'>{exam.examGetResponse.title}</CardTitle>
             <CardDescription>Complete all questions before submitting</CardDescription>
           </CardHeader>
 
-          <CardContent className='space-y-6'>
+          <CardContent className='space-y-6 p-2 md:p-4'>
             {viewMode === 'card' ? (
-              <div className='space-y-4 min-h-[225px] p-3 border'>
+              <div className='space-y-4 min-h-[225px]'>
                 {questions[currentQuestionIndex] &&
                   renderQuestion(questions[currentQuestionIndex], currentQuestionIndex)}
               </div>

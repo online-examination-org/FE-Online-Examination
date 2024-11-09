@@ -11,7 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 
 interface StudentRecordTableProps {
   results: ExamResult[]
-  examId: number | string
+  examId: number | string | undefined
 }
 
 const StudentRecordDisplay: React.FC<StudentRecordTableProps> = ({ results, examId }) => {
@@ -24,9 +24,30 @@ const StudentRecordDisplay: React.FC<StudentRecordTableProps> = ({ results, exam
     return 'bg-red-100 text-red-800'
   }
 
+  const formatDateTimeWithTimezone = (dateTimeString) => {
+    const date = new Date(dateTimeString)
+    const dateWithTimezone = new Date(date.getTime())
+    return dateWithTimezone.toLocaleString('en-US', {
+      timeZone: 'Asia/Ho_Chi_Minh',
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    })
+  }
+
+  const differenceTime = (startTime: any, endTime: any) => {
+    const start = new Date(startTime)
+    const end = new Date(endTime)
+
+    const diffMs = end.getTime() - start.getTime()
+    const minutes = Math.floor(diffMs / 60000)
+    const seconds = Math.floor((diffMs % 60000) / 1000)
+
+    return `${minutes}m ${seconds}s`
+  }
+
   const CardView = () => (
     <ScrollArea className='h-[calc(100vh-250px)] pr-4'>
-      <div className='grid gap-4 md:grid-cols-4'>
+      <div className='grid gap-4 md:grid-cols-3'>
         {results.map((result) => (
           <Card key={result.examResultId} className='hover:shadow-lg transition-shadow'>
             <CardContent className='pt-6'>
@@ -45,11 +66,11 @@ const StudentRecordDisplay: React.FC<StudentRecordTableProps> = ({ results, exam
               <div className='mt-4 space-y-2'>
                 <div className='flex items-center text-sm text-gray-600'>
                   <Clock className='h-4 w-4 mr-2' />
-                  Completion: {result.finishedAt}
+                  Duration: {differenceTime(result?.startedAt, result?.finishedAt)}
                 </div>
                 <div className='flex items-center text-sm text-gray-600'>
                   <Calendar className='h-4 w-4 mr-2' />
-                  Submitted: {result.finishedAt}
+                  Submitted: {formatDateTimeWithTimezone(result.finishedAt)}
                 </div>
               </div>
 
@@ -83,7 +104,7 @@ const StudentRecordDisplay: React.FC<StudentRecordTableProps> = ({ results, exam
                 <TableHead>Student</TableHead>
                 <TableHead>ID</TableHead>
                 <TableHead className='text-center'>Score</TableHead>
-                <TableHead>Completion Time</TableHead>
+                <TableHead>Duration</TableHead>
                 <TableHead>Submitted At</TableHead>
                 <TableHead className='pl-5'>Actions</TableHead>
               </TableRow>
@@ -108,13 +129,13 @@ const StudentRecordDisplay: React.FC<StudentRecordTableProps> = ({ results, exam
                   <TableCell>
                     <div className='flex items-center gap-2'>
                       <Clock className='h-4 w-4 text-gray-500' />
-                      {result.finishedAt}
+                      {differenceTime(result?.startedAt, result?.finishedAt)}
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className='flex items-center gap-2'>
                       <Calendar className='h-4 w-4 text-gray-500' />
-                      {result.finishedAt}
+                      {formatDateTimeWithTimezone(result.finishedAt)}
                     </div>
                   </TableCell>
                   <TableCell className='text-right'>
@@ -137,9 +158,7 @@ const StudentRecordDisplay: React.FC<StudentRecordTableProps> = ({ results, exam
     </div>
   )
 
-  useEffect(() => {
-    
-  }, [])
+  useEffect(() => {}, [])
 
   return (
     <div className='w-full mx-auto space-y-4'>

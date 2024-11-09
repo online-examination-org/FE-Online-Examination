@@ -326,6 +326,15 @@ interface UpdateExamProps {
   isActive: boolean
 }
 
+function compareDateWithNow(inputDate: any) {
+  const now = new Date()
+  const input = new Date(inputDate)
+
+  if (input < now) {
+    return true
+  }
+  return false
+}
 const ExamDetails: React.FC<ExamProps> = ({ exam: initialExam, setRefesh }) => {
   const { toast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
@@ -436,14 +445,21 @@ const ExamDetails: React.FC<ExamProps> = ({ exam: initialExam, setRefesh }) => {
           <CardTitle className='text-2xl font-bold'>{exam?.title || ''}</CardTitle>
           <div className='flex items-center gap-4'>
             <div className='flex items-center space-x-2'>
-              <Switch checked={isActive} onCheckedChange={handleActiveToggle} disabled={isUpdating} id='exam-status' />
+              <Switch
+                checked={isActive}
+                onCheckedChange={handleActiveToggle}
+                disabled={isUpdating || compareDateWithNow(exam?.startTime)}
+                id='exam-status'
+              />
               <label htmlFor='exam-status' className='text-sm font-medium'>
                 {isActive ? 'Active' : 'Inactive'}
               </label>
             </div>
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
               <DialogTrigger asChild>
-                <Button variant='outline'>Edit Exam</Button>
+                <Button variant='outline' disabled={isUpdating || compareDateWithNow(exam?.startTime)}>
+                  Edit Exam
+                </Button>
               </DialogTrigger>
               <DialogContent className='max-w-2xl'>
                 <DialogHeader>
@@ -522,7 +538,7 @@ const ExamDetails: React.FC<ExamProps> = ({ exam: initialExam, setRefesh }) => {
                       )}
                     />
                     <DialogFooter>
-                      <Button type='submit' disabled={isUpdating}>
+                      <Button type='submit' disabled={isUpdating || compareDateWithNow(exam?.startTime)}>
                         {isUpdating ? 'Saving...' : 'Save changes'}
                       </Button>
                     </DialogFooter>

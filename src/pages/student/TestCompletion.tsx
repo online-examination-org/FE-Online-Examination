@@ -6,7 +6,7 @@ import { CheckCircle2 } from 'lucide-react'
 const TestCompletion = () => {
   const formatDateTimeWithTimezone = (dateTimeString) => {
     const date = new Date(dateTimeString)
-    const dateWithTimezone = new Date(date.getTime() + 7 * 60 * 60 * 1000)
+    const dateWithTimezone = new Date(date.getTime())
     return dateWithTimezone.toLocaleString('en-US', {
       timeZone: 'Asia/Ho_Chi_Minh',
       dateStyle: 'medium',
@@ -32,10 +32,10 @@ const TestCompletion = () => {
   const duration = differenceTime(startTime, endTime)
 
   return (
-    <div className='min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4'>
+    <div className='min-h-screen bg-gray-50 flex flex-col items-center justify-center'>
       <div className='w-full max-w-md space-y-6 bg-white p-10 border rounded-lg'>
         <div className='text-center space-y-2'>
-          <h1 className='text-2xl font-bold'>You successfully submitted the test</h1>
+          <h1 className='text-2xl font-bold'>Submitted successfully</h1>
           <p className='text-gray-600'>The test result is stored in the system</p>
 
           <div className='flex justify-center my-6'>

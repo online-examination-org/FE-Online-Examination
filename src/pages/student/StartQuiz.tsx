@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { startQuiz } from '@/services/students.services'
 import { setQuestions } from '@/store/slices/questionSlice'
+import { Separator } from '@radix-ui/react-separator'
 
 export default function StartQuiz() {
   const { examGetResponse } = useSelector((state: any) => state.exam)
@@ -44,7 +45,7 @@ export default function StartQuiz() {
   }
 
   return (
-    <div className='min-h-screen w-full flex items-start md:items-center justify-center bg-primary-foreground p-4'>
+    <div className='min-h-screen w-full flex items-center justify-center bg-primary-foreground p-4'>
       <div className='flex h-full items-stretch justify-center w-[700px] border rounded-lg overflow-hidden'>
         <div
           className='hidden md:flex w-2/5 bg-cover bg-center p-6 flex-col items-start justify-start text-gray-700'
@@ -55,34 +56,34 @@ export default function StartQuiz() {
         ></div>
         <div className='w-full md:w-3/5'>
           <CardHeader className='space-y-1'>
-            <CardTitle className='text-xl font-bold text-center'>Test Infomation</CardTitle>
+            <CardTitle className='text-xl font-bold text-center'>Exam Infomation</CardTitle>
           </CardHeader>
           <CardContent className='space-y-6'>
             <div className='space-y-1'>
               <h3 className='font-medium text-sm text-muted-foreground'>Test Name</h3>
-              <p className='text-lg font-semibold'>{examGetResponse.title}</p>
+              <p className='text-lg font-semibold px-3'>{examGetResponse.title}</p>
             </div>
 
             <div className='space-y-1'>
               <h3 className='font-medium text-sm text-muted-foreground'>Description</h3>
-              <p className='text-sm font-normal'>{examGetResponse.description}</p>
+              <p className='text-sm font-normal px-3'>{examGetResponse.description}</p>
             </div>
 
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div className='space-y-1'>
                 <h3 className='font-medium text-sm text-muted-foreground'>Start Time</h3>
-                <p className='text-sm'>{formatDateTimeWithTimezone(examGetResponse.startTime)}</p>
+                <p className='text-sm px-3'>{formatDateTimeWithTimezone(examGetResponse.startTime)}</p>
               </div>
 
               <div className='space-y-1'>
                 <h3 className='font-medium text-sm text-muted-foreground'>End Time</h3>
-                <p className='text-sm'>{formatDateTimeWithTimezone(examGetResponse.endTime)}</p>
+                <p className='text-sm px-3'>{formatDateTimeWithTimezone(examGetResponse.endTime)}</p>
               </div>
             </div>
 
             <div className='space-y-1'>
               <h3 className='font-medium text-sm text-muted-foreground'>Duration</h3>
-              <p className='text-sm'>{examGetResponse.duration} minutes</p>
+              <p className='text-sm px-3'>{examGetResponse.duration} minutes</p>
             </div>
 
             <Button className='w-full font-semibold' onClick={handleStartQuiz}>
