@@ -5,11 +5,12 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { login } from '@/services/teachers.services'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useToast } from '@/hooks/use-toast'
 import { Loader2 } from 'lucide-react'
 import PillInput from '@/components/ui/input-custom'
+import { Separator } from '@/components/ui/separator'
 
 // Define the form schema with Yup
 const loginSchema = yup
@@ -112,6 +113,19 @@ export default function Login() {
               </div>
             </div>
           </form>
+
+          <div className='relative my-6'>
+            <div className='absolute inset-0 flex items-center'>
+              <Separator className='w-full' />
+            </div>
+            <div className='relative flex justify-center text-xs uppercase'>
+              <span className='bg-background px-2 text-muted-foreground'>Or continue as</span>
+            </div>
+          </div>
+
+          <Button variant='outline' className='w-full min-h-[45px]' asChild>
+            <Link to='/join'>I'm a student</Link>
+          </Button>
         </CardContent>
       </Card>
     </div>

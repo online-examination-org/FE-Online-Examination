@@ -423,7 +423,7 @@ const ExamDetails: React.FC<ExamProps> = ({ exam: initialExam, setRefesh }) => {
     }
   }
 
-  const qrValue = `http://localhost:3000/join?passcode=${exam?.passcode || ''}`
+  const qrValue = `https://fe-online-examination.vercel.app/join?passcode=${exam?.passcode || ''}`
 
   const formatDateTime = (isoString: string) => {
     return format(new Date(isoString), 'dd/MM/yyyy HH:mm')
