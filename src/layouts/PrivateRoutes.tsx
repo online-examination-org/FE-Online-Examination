@@ -18,8 +18,9 @@ export const TeacherRoutes = () => {
 }
 
 export const StudentRoutes = () => {
-  return <Outlet /> // const token = localStorage.getItem('access_token')
-  // if (!token) return <Navigate to='/join' />
-  // const decoded = jwtDecode<DecodedToken>(token)
-  // return decoded.role === 'student' ? <Outlet /> : <Navigate to='*' />
+  // return <Outlet />
+  const token = localStorage.getItem('st_access_token')
+  if (!token) return <Navigate to='/join' />
+  const decoded = jwtDecode<DecodedToken>(token)
+  return decoded.role === 'student' ? <Outlet /> : <Navigate to='*' />
 }

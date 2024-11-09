@@ -44,16 +44,16 @@ export default function StartQuiz() {
   }
 
   return (
-    <div className='min-h-screen w-full flex items-center justify-center bg-primary-foreground p-4'>
+    <div className='min-h-screen w-full flex items-start md:items-center justify-center bg-primary-foreground p-4'>
       <div className='flex h-full items-stretch justify-center w-[700px] border rounded-lg overflow-hidden'>
         <div
-          className='w-2/5 bg-cover bg-center p-6 flex flex-col items-start justify-start text-gray-700'
+          className='hidden md:flex w-2/5 bg-cover bg-center p-6 flex-col items-start justify-start text-gray-700'
           style={{
             backgroundImage:
               "url('https://images.unsplash.com/photo-1662120455989-5a433cec9980?q=80&w=1914&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"
           }}
         ></div>
-        <div className='w-3/5'>
+        <div className='w-full md:w-3/5'>
           <CardHeader className='space-y-1'>
             <CardTitle className='text-xl font-bold text-center'>Test Infomation</CardTitle>
           </CardHeader>
