@@ -11,7 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 
 interface StudentRecordTableProps {
   results: ExamResult[]
-  examId: number | string
+  examId: number | string | undefined
 }
 
 const StudentRecordDisplay: React.FC<StudentRecordTableProps> = ({ results, examId }) => {
@@ -137,9 +137,7 @@ const StudentRecordDisplay: React.FC<StudentRecordTableProps> = ({ results, exam
     </div>
   )
 
-  useEffect(() => {
-    
-  }, [])
+  useEffect(() => {}, [])
 
   return (
     <div className='w-full mx-auto space-y-4'>
