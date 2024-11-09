@@ -54,7 +54,7 @@ const StudentQuizResult = () => {
         <CardContent className='pt-6'>
           <div className='flex justify-between items-center mb-4'>
             <div>
-              <h1 className='text-2xl font-bold text-gray-800'>Quiz Result</h1>
+              <h1 className='text-2xl font-bold text-gray-800'>Student Quiz Result</h1>
             </div>
             <div className='text-center'>
               <div className='flex items-center gap-2'>
@@ -79,7 +79,7 @@ const StudentQuizResult = () => {
                     <Badge variant={question.questionType === 'multipleChoice' ? 'default' : 'secondary'}>
                       {question.questionType === 'multipleChoice' ? 'Multiple Choice' : 'Short Answer'}
                     </Badge>
-                    <Badge variant={question.correct ? 'success' : 'destructive'}>
+                    <Badge className={question.correct ? 'bg-blue-300 text-black' : 'bg-red-100 text-black'}>
                       {question.correct ? 'Correct' : 'Incorrect'}
                     </Badge>
                   </div>
