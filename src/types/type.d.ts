@@ -34,17 +34,17 @@ interface Teacher {
 }
 
 export interface Exam {
-  createdAt: string
-  updatedAt: string
-  examId: number
-  title: string
-  passcode: string
-  startTime: string
-  endTime: string
-  duration: number
-  description: string
-  teacher: Teacher
-  isActive: boolean
+  createdAt?: string
+  updatedAt?: string
+  examId?: number
+  title?: string
+  passcode?: string
+  startTime?: string
+  endTime?: string
+  duration?: number
+  description?: string
+  teacher?: Teacher
+  isActive?: boolean
 }
 
 export interface ExamResult {
@@ -88,4 +88,40 @@ export interface EditQuestionBody {
   choices: {
     [key: string]: string
   }
+}
+
+export interface JoinPayloadProps {
+  name: string
+  studendId: string
+  mail: string
+  passcode: string
+}
+
+interface SubmitQuizProps {
+  finish_at: string
+}
+
+interface JoinQuizProps {
+  passcode: string
+  studentId: string
+  name: string
+  email: string
+}
+
+interface StartQuizProps {
+  startedAt: string
+}
+
+interface saveQuizProps {
+  question_id: number
+  response: string
+}
+
+interface UpdateExamProps {
+  title?: string
+  startTime?: string
+  endTime?: string
+  duration?: number
+  description?: string
+  isActive?: boolean
 }

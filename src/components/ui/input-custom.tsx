@@ -13,7 +13,7 @@ interface PillInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 const PillInput: React.FC<PillInputProps> = ({ label, id, error, disabled, register, className, ...props }) => {
   return (
     <div className='flex flex-col'>
-      <div className={`relative h-[50px] pt-4 mt-2 border border-gray-300 rounded-md ${className}`}>
+      <div className={`relative h-[52px] pt-4 mt-2 border border-gray-300 rounded-md ${className}`}>
         <div className='absolute -top-3 left-3 z-10'>
           <span
             className='px-3 py-0.4 bg-white font-medium text-black rounded-full border border-gray-300'
