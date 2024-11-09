@@ -48,6 +48,7 @@ export default function JoinQuiz() {
   const [searchParams] = useSearchParams()
   const dispatch = useDispatch()
   const { toast } = useToast()
+
   useEffect(() => {
     const passcodeParam = searchParams.get('passcode')
     if (passcodeParam) {
@@ -60,7 +61,6 @@ export default function JoinQuiz() {
       await new Promise((resolve) => setTimeout(resolve, 1000))
       console.log('Form submitted:', JSON.stringify(data, null, 2))
       const response = await joinQuiz(data)
-      // set student token
 
       if (response) {
         console.log(response)
@@ -70,7 +70,6 @@ export default function JoinQuiz() {
         toast({ description: 'Join test successfully' })
       }
 
-      // reset()
       navigate('/start')
     } catch (error) {
       console.error('Error submitting form:', error)
@@ -78,23 +77,27 @@ export default function JoinQuiz() {
   }
 
   return (
-    <div className='min-h-screen w-full flex items-center justify-center bg-slate-100 p-4'>
-      <div className='flex h-full items-stretch justify-center w-[700px] border rounded-lg overflow-hidden'>
+    <div className='min-h-screen w-full flex items-start md:items-center justify-center bg-slate-100 p-4'>
+      <div className='w-full max-w-4xl flex flex-col md:flex-row items-stretch justify-center border rounded-lg overflow-hidden bg-white'>
+        {/* Background image - hidden on mobile, visible from md breakpoint */}
         <div
-          className='w-2/5 bg-cover bg-center p-6 flex flex-col items-start justify-start text-gray-700'
+          className='hidden md:block md:w-2/5 bg-cover bg-center'
           style={{
             backgroundImage:
               "url('https://images.unsplash.com/photo-1662120455989-5a433cec9980?q=80&w=1914&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')"
           }}
-        ></div>
-        <div className='w-3/5'>
-          <CardHeader className='space-y-1'>
-            <CardTitle className='text-xl font-bold'>Student Information</CardTitle>
+        />
+
+        {/* Form section - full width on mobile, 3/5 width from md breakpoint */}
+        <div className='w-full md:w-3/5 p-4'>
+          <CardHeader className='space-y-1 px-0 md:px-4'>
+            <CardTitle className='text-xl md:text-2xl font-bold'>Student Information</CardTitle>
             <CardDescription className='font-light'>Please enter your student information</CardDescription>
           </CardHeader>
-          <CardContent className='bg-white'>
+
+          <CardContent className='p-0 md:p-4'>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-              <div className='flex flex-col w-full gap-6'>
+              <div className='flex flex-col w-full gap-4 md:gap-6'>
                 <PillInput
                   label='Passcode'
                   id='passcode'
@@ -108,7 +111,7 @@ export default function JoinQuiz() {
                   label='Student ID'
                   id='studentId'
                   type='studentId'
-                  placeholder='Enter your StudentId'
+                  placeholder='Enter your Student ID'
                   register={register('studentId')}
                   error={errors.studentId?.message}
                   disabled={isSubmitting}
@@ -131,7 +134,7 @@ export default function JoinQuiz() {
                   error={errors.email?.message}
                   disabled={isSubmitting}
                 />
-                <Button className='w-full font-semibold min-h-[45px]' type='submit' disabled={isSubmitting}>
+                <Button className='w-full font-semibold min-h-[45px] mt-4' type='submit' disabled={isSubmitting}>
                   {isSubmitting ? 'Submitting...' : 'Submit'}
                 </Button>
               </div>
