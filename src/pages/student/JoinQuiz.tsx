@@ -1,6 +1,4 @@
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -36,8 +34,7 @@ export default function JoinQuiz() {
     register,
     setValue,
     handleSubmit,
-    formState: { errors, isSubmitting },
-    reset
+    formState: { errors, isSubmitting }
   } = useForm<FormData>({
     resolver: yupResolver(schema),
     defaultValues: {
