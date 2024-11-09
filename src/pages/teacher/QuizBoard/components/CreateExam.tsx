@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -100,7 +101,7 @@ const QuestionItem = ({ question, originalQuestion, questionErrors, questionNumb
         if (questionData.questionType === 'multipleChoice') {
           const letters = ['A', 'B', 'C', 'D']
           const newChoices = Object.fromEntries(
-            Object.entries(questionData.choices).map(([key, value], index) => [letters[index], value])
+            Object.entries(questionData.choices).map(([, value], index) => [letters[index], value])
           )
           payload = {
             ...questionData,
@@ -128,7 +129,7 @@ const QuestionItem = ({ question, originalQuestion, questionErrors, questionNumb
         if (questionData.questionType === 'multipleChoice') {
           const letters = ['A', 'B', 'C', 'D']
           const newChoices = Object.fromEntries(
-            Object.entries(questionData.choices).map(([key, value], index) => [letters[index], value])
+            Object.entries(questionData.choices).map(([, value], index) => [letters[index], value])
           )
           payload = {
             ...questionData,
