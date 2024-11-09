@@ -182,7 +182,7 @@ const MakeQuiz = () => {
   )
 
   const QuizPanels = () => (
-    <div className='w-1/4 p-4 border sticky top-2 flex-grow rounded-lg'>
+    <div className='w-full md:w-1/4 p-4 border block md:sticky top-2 flex-grow rounded-lg'>
       <div className='space-y-2 mb-5'>
         <div className='flex justify-between text-sm text-gray-500'>
           <span>Progress</span>
@@ -275,8 +275,8 @@ const MakeQuiz = () => {
 
       <ViewToggle />
 
-      <div className='flex items-start gap-5 w-full'>
-        <Card className='w-3/4 flex-grow'>
+      <div className='flex items-start gap-5 w-full flex-wrap-reverse'>
+        <Card className='w-full md:w-3/4 flex-grow'>
           <CardHeader>
             <CardTitle className='text-2xl'>{exam.examGetResponse.title}</CardTitle>
             <CardDescription>Complete all questions before submitting</CardDescription>
