@@ -119,7 +119,7 @@ export default function JoinQuiz() {
                   type='name'
                   placeholder='Enter your name'
                   register={register('name')}
-                  error={errors.fullName?.message}
+                  error={errors?.fullName?.message}
                   disabled={isSubmitting}
                 />
                 <PillInput
