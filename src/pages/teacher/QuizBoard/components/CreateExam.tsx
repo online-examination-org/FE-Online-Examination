@@ -17,18 +17,25 @@ interface CreateExamProps {
   setRefresh: () => void
 }
 
-const transformQuestionForAPI = (question) => {
+interface QuestionState {
+  id: string | number
+  questionText: string
+  questionType: 'multipleChoice' | 'shortQuestion'
+  choices: string[]
+  answer: string
+  shortAnswer: string
+  isEditing: boolean
+}
+
+const transformQuestionForAPI = (question: QuestionState) => {
   const baseData = {
-    questionId: question.id,
     questionText: question.questionText,
     questionType: question.questionType
   }
 
   if (question.questionType === 'multipleChoice') {
-    const choices = {}
-    question.choices.forEach((choice, index) => {
-      choices[index] = choice
-    })
+    const letters = ['A', 'B', 'C', 'D']
+    const choices = Object.fromEntries(question.choices.map((choice, index) => [letters[index], choice]))
 
     return {
       ...baseData,
@@ -43,122 +50,23 @@ const transformQuestionForAPI = (question) => {
   }
 }
 
-const QuestionItem = ({ question, originalQuestion, questionErrors, questionNumber, exam_id, ...props }) => {
-  const [isVisible, setIsVisible] = useState(true)
-
-  const validateBeforeSave = (question) => {
-    const errors = {}
-
-    if (!question.questionText.trim()) {
-      errors.questionText = 'Question text is required'
-    }
-
-    if (question.questionType === 'multipleChoice') {
-      if (question.answer === '') {
-        errors.answer = 'Please select an answer'
-        return errors
-      }
-      if (question.choices.some((choice) => !choice.trim())) {
-        errors.choices = 'All options must be filled'
-      }
-    } else if (question.questionType === 'shortQuestion') {
-      if (!question.shortAnswer?.trim()) {
-        errors.shortAnswer = 'Answer is required'
-      }
-    }
-
-    return errors
-  }
-
-  const handleDelete = async () => {
-    try {
-      if (originalQuestion.id && originalQuestion.id !== 'new') {
-        await deleteQuestion(originalQuestion.id, exam_id.toString())
-        setIsVisible(false)
-        props.setRefresh()
-      } else {
-        props.onDelete(props.questionIndex)
-      }
-    } catch (error) {
-      console.error('Error deleting question:', error)
-    }
-  }
-
-  const handleSave = async () => {
-    try {
-      const validationErrors = validateBeforeSave(question)
-      if (Object.keys(validationErrors).length > 0) {
-        props.onValidationErrors(question.id, validationErrors)
-        return
-      }
-
-      const questionData = transformQuestionForAPI(question)
-
-      const isExistingQuestion = originalQuestion.id && originalQuestion.id !== 'new'
-
-      if (isExistingQuestion) {
-        let payload
-        if (questionData.questionType === 'multipleChoice') {
-          const letters = ['A', 'B', 'C', 'D']
-          const newChoices = Object.fromEntries(
-            Object.entries(questionData.choices).map(([, value], index) => [letters[index], value])
-          )
-          payload = {
-            ...questionData,
-            choices: newChoices,
-            exam_id,
-            questionId: originalQuestion.id
-          }
-        } else {
-          payload = {
-            ...questionData,
-            exam_id,
-            questionId: originalQuestion.id
-          }
-        }
-
-        try {
-          await editQuestion(originalQuestion.id, exam_id, payload as EditQuestionBody)
-          props.setRefresh()
-        } catch (err) {
-          console.error('Error updating question:', err)
-          throw err
-        }
-      } else {
-        let payload
-        if (questionData.questionType === 'multipleChoice') {
-          const letters = ['A', 'B', 'C', 'D']
-          const newChoices = Object.fromEntries(
-            Object.entries(questionData.choices).map(([, value], index) => [letters[index], value])
-          )
-          payload = {
-            ...questionData,
-            choices: newChoices,
-            exam_id
-          }
-        } else {
-          payload = {
-            ...questionData,
-            exam_id
-          }
-        }
-
-        try {
-          await createQuestion([payload] as CreateQuestionBody[])
-          props.setRefresh()
-        } catch (err) {
-          console.error('Error creating question:', err)
-          throw err
-        }
-      }
-      props.onToggleEdit(question)
-    } catch (error) {
-      console.error('Error saving question:', error)
-    }
-  }
-
-  if (!isVisible) return null
-
+const QuestionItem = ({
+  question,
+  questionNumber,
+  onDelete,
+  onSave,
+  onEdit,
+  onQuestionChange,
+  errors
+}: {
+  question: QuestionState
+  questionNumber: number
+  onDelete: (id: string | number) => void
+  onSave: (question: QuestionState) => void
+  onEdit: (id: string | number) => void
+  onQuestionChange: (id: string | number, field: string, value: any) => void
+  errors: Record<string, string>
+}) => {
   return (
     <div className='w-full mb-7 px-3'>
       <Card className='w-full rounded-lg'>
@@ -173,15 +81,15 @@ const QuestionItem = ({ question, originalQuestion, questionErrors, questionNumb
                 <>
                   <Input
                     value={question.questionText}
-                    onChange={(e) => props.onQuestionChange(question.id, 'questionText', e.target.value)}
-                    className={questionErrors.questionText ? 'border-red-500' : ''}
+                    onChange={(e) => onQuestionChange(question.id, 'questionText', e.target.value)}
+                    className={errors.questionText ? 'border-red-500' : ''}
                   />
                   <Select
                     value={question.questionType}
                     onValueChange={(value) => {
-                      props.onQuestionChange(question.id, 'questionType', value)
-                      props.onQuestionChange(question.id, 'answer', '')
-                      props.onQuestionChange(question.id, 'shortAnswer', '')
+                      onQuestionChange(question.id, 'questionType', value)
+                      onQuestionChange(question.id, 'answer', '')
+                      onQuestionChange(question.id, 'shortAnswer', '')
                     }}
                   >
                     <SelectTrigger className='w-[180px]'>
@@ -201,16 +109,14 @@ const QuestionItem = ({ question, originalQuestion, questionErrors, questionNumb
                       {question.questionType === 'multipleChoice' ? 'Multiple choice' : 'Short answer'}
                     </div>
                   </div>
-                  <Button variant='ghost' size='icon' onClick={() => props.onToggleEdit(question)}>
+                  <Button variant='ghost' size='icon' onClick={() => onEdit(question.id)}>
                     <Pencil className='w-4 h-4' />
                   </Button>
                 </>
               )}
             </div>
           </div>
-          {questionErrors.questionText && (
-            <div className='text-red-500 text-sm mt-1'>{questionErrors.questionText}</div>
-          )}
+          {errors.questionText && <div className='text-red-500 text-sm mt-1'>{errors.questionText}</div>}
         </CardHeader>
         <CardContent className='space-y-6'>
           {question.questionType === 'multipleChoice' ? (
@@ -218,7 +124,7 @@ const QuestionItem = ({ question, originalQuestion, questionErrors, questionNumb
               <RadioGroup
                 className='space-y-2'
                 value={question.answer}
-                onValueChange={(value) => props.onQuestionChange(question.id, 'answer', value)}
+                onValueChange={(value) => onQuestionChange(question.id, 'answer', value)}
               >
                 {question.choices.map((choice, choiceIndex) => (
                   <div className='flex items-center space-x-2' key={choiceIndex}>
@@ -229,9 +135,9 @@ const QuestionItem = ({ question, originalQuestion, questionErrors, questionNumb
                         onChange={(e) => {
                           const newChoices = [...question.choices]
                           newChoices[choiceIndex] = e.target.value
-                          props.onQuestionChange(question.id, 'choices', newChoices)
+                          onQuestionChange(question.id, 'choices', newChoices)
                         }}
-                        className={questionErrors.choices ? 'border-red-500' : ''}
+                        className={errors.choices ? 'border-red-500' : ''}
                       />
                     ) : (
                       <div className='px-3 py-2'>{choice}</div>
@@ -239,31 +145,33 @@ const QuestionItem = ({ question, originalQuestion, questionErrors, questionNumb
                   </div>
                 ))}
               </RadioGroup>
-              {questionErrors.answer && <div className='text-red-500 text-sm'>{questionErrors.answer}</div>}
-              {questionErrors.choices && <div className='text-red-500 text-sm'>{questionErrors.choices}</div>}
+              {errors.answer && <div className='text-red-500 text-sm'>{errors.answer}</div>}
+              {errors.choices && <div className='text-red-500 text-sm'>{errors.choices}</div>}
             </div>
           ) : (
             <div>
               <Textarea
                 placeholder='Enter the answer'
                 value={question.shortAnswer}
-                onChange={(e) => props.onQuestionChange(question.id, 'shortAnswer', e.target.value)}
-                className={questionErrors.shortAnswer ? 'border-red-500' : ''}
+                onChange={(e) => onQuestionChange(question.id, 'shortAnswer', e.target.value)}
+                className={errors.shortAnswer ? 'border-red-500' : ''}
                 disabled={!question.isEditing}
               />
-              {questionErrors.shortAnswer && (
-                <div className='text-red-500 text-sm mt-1'>{questionErrors.shortAnswer}</div>
-              )}
+              {errors.shortAnswer && <div className='text-red-500 text-sm mt-1'>{errors.shortAnswer}</div>}
             </div>
           )}
         </CardContent>
         {question.isEditing && (
           <CardFooter>
             <div className='flex gap-4 justify-end w-full'>
-              <Button variant='outline' className='border border-red-500 text-red-500' onClick={handleDelete}>
+              <Button
+                variant='outline'
+                className='border border-red-500 text-red-500'
+                onClick={() => onDelete(question.id)}
+              >
                 Delete
               </Button>
-              <Button onClick={handleSave}>Save</Button>
+              <Button onClick={() => onSave(question)}>Save</Button>
             </div>
           </CardFooter>
         )}
@@ -273,16 +181,17 @@ const QuestionItem = ({ question, originalQuestion, questionErrors, questionNumb
 }
 
 const CreateExam = ({ questions: initialQuestions, exam_id, setRefresh }: CreateExamProps) => {
-  const initialQuestion = {
+  const createInitialQuestion = (id: string | number): QuestionState => ({
+    id,
     questionText: 'New question',
     questionType: 'multipleChoice',
     choices: ['Option 1', 'Option 2', 'Option 3', 'Option 4'],
     answer: '',
     shortAnswer: '',
     isEditing: true
-  }
+  })
 
-  const transformInitialQuestions = () => {
+  const transformInitialQuestions = (): QuestionState[] => {
     if (!initialQuestions?.length) return []
 
     return initialQuestions.map((q) => ({
@@ -301,33 +210,51 @@ const CreateExam = ({ questions: initialQuestions, exam_id, setRefresh }: Create
     }))
   }
 
-  const [questions, setQuestions] = useState(transformInitialQuestions)
-  const [editingStates, setEditingStates] = useState({})
-  const [errors, setErrors] = useState({})
-  const scrollAreaRef = useRef(null)
-  const addButtonRef = useRef(null)
+  const [questions, setQuestions] = useState<QuestionState[]>(transformInitialQuestions)
+  const [errors, setErrors] = useState<Record<string | number, Record<string, string>>>({})
+  const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const [nextId, setNextId] = useState(1)
 
   useEffect(() => {
-    if (questions.length === 0) handleAddQuestion()
+    if (questions.length === 0) {
+      handleAddQuestion()
+    }
   }, [])
 
-  const handleAddQuestion = () => {
-    const hasUnsavedQuestions = questions.some((q) => editingStates[q.id]?.isEditing)
+  const validateQuestion = (question: QuestionState) => {
+    const newErrors: Record<string, string> = {}
 
+    if (!question.questionText.trim()) {
+      newErrors.questionText = 'Question text is required'
+    }
+
+    if (question.questionType === 'multipleChoice') {
+      if (question.answer === '') {
+        newErrors.answer = 'Please select an answer'
+      }
+      if (question.choices.some((choice) => !choice.trim())) {
+        newErrors.choices = 'All options must be filled'
+      }
+    } else if (question.questionType === 'shortQuestion') {
+      if (!question.shortAnswer?.trim()) {
+        newErrors.shortAnswer = 'Answer is required'
+      }
+    }
+
+    return newErrors
+  }
+
+  const handleAddQuestion = () => {
+    const hasUnsavedQuestions = questions.some((q) => q.isEditing)
     if (hasUnsavedQuestions) {
       alert('Please save the current question before adding a new one')
       return
     }
 
-    const newQuestion = { ...initialQuestion, id: 'new' }
-    setQuestions([...questions, newQuestion])
-    setEditingStates((prev) => ({
-      ...prev,
-      [newQuestion.id]: {
-        ...newQuestion,
-        isEditing: true
-      }
-    }))
+    const newId = `new-${nextId}`
+    setNextId((prev) => prev + 1)
+    const newQuestion = createInitialQuestion(newId)
+    setQuestions((prev) => [...prev, newQuestion])
 
     setTimeout(() => {
       if (scrollAreaRef.current) {
@@ -342,111 +269,72 @@ const CreateExam = ({ questions: initialQuestions, exam_id, setRefresh }: Create
     }, 100)
   }
 
-  const handleDeleteQuestion = (index) => {
-    const questionId = questions[index].id
-    const newQuestions = questions.filter((_, i) => i !== index)
-    setQuestions(newQuestions)
-    const newEditingStates = { ...editingStates }
-    delete newEditingStates[questionId]
-    setEditingStates(newEditingStates)
-
-    const newErrors = { ...errors }
-    delete newErrors[questionId]
-    setErrors(newErrors)
-  }
-
-  const handleQuestionChange = (questionId, field, value) => {
-    setEditingStates((prev) => ({
-      ...prev,
-      [questionId]: {
-        ...prev[questionId],
-        [field]: value
-      }
-    }))
+  const handleQuestionChange = (questionId: string | number, field: string, value: any) => {
+    setQuestions((prev) => prev.map((q) => (q.id === questionId ? { ...q, [field]: value } : q)))
 
     if (errors[questionId]) {
-      const newErrors = { ...errors }
-      delete newErrors[questionId]
-      setErrors(newErrors)
-    }
-  }
-
-  const handleValidationErrors = (questionId, validationErrors) => {
-    setErrors((prev) => ({
-      ...prev,
-      [questionId]: validationErrors
-    }))
-  }
-
-  const validateQuestion = (question) => {
-    const newErrors = {}
-
-    if (!question.questionText.trim()) {
-      newErrors.questionText = 'Question text is required'
-    }
-
-    if (question.questionType === 'multipleChoice') {
-      if (question.answer === '') {
-        newErrors.answer = 'Please select an answer'
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[questionId]
         return newErrors
-      }
-      if (question.choices.some((choice) => !choice.trim())) {
-        newErrors.choices = 'All options must be filled'
-      }
-    } else if (question.questionType === 'shortQuestion') {
-      if (!question.shortAnswer?.trim()) {
-        newErrors.shortAnswer = 'Answer is required'
-      }
+      })
     }
-
-    return newErrors
   }
 
-  const toggleEditMode = (question) => {
-    const questionId = question.id
-    if (!editingStates[questionId]?.isEditing) {
-      setEditingStates((prev) => ({
+  const handleEdit = (questionId: string | number) => {
+    setQuestions((prev) => prev.map((q) => (q.id === questionId ? { ...q, isEditing: true } : q)))
+  }
+
+  const handleDelete = async (questionId: string | number) => {
+    try {
+      if (typeof questionId === 'number') {
+        await deleteQuestion(questionId, exam_id.toString())
+        setRefresh()
+      }
+      setQuestions((prev) => prev.filter((q) => q.id !== questionId))
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[questionId]
+        return newErrors
+      })
+    } catch (error) {
+      console.error('Error deleting question:', error)
+    }
+  }
+
+  const handleSave = async (question: QuestionState) => {
+    const validationErrors = validateQuestion(question)
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors((prev) => ({
         ...prev,
-        [questionId]: {
-          ...question,
-          isEditing: true
-        }
+        [question.id]: validationErrors
       }))
-    } else {
-      const currentQuestion = editingStates[questionId]
-      const validationErrors = validateQuestion(currentQuestion)
+      return
+    }
 
-      if (Object.keys(validationErrors).length > 0) {
-        setErrors({
-          ...errors,
-          [questionId]: validationErrors
-        })
-        return
+    try {
+      const questionData = transformQuestionForAPI(question)
+      const payload = {
+        ...questionData,
+        exam_id
       }
 
-      setQuestions(
-        questions.map((q) => {
-          if (q.id === questionId) {
-            return {
-              ...editingStates[questionId],
-              isEditing: false
-            }
-          }
-          return q
-        })
-      )
-      const newEditingStates = { ...editingStates }
-      delete newEditingStates[questionId]
-      setEditingStates(newEditingStates)
+      if (typeof question.id === 'number') {
+        await editQuestion(question.id, exam_id, payload as EditQuestionBody)
+      } else {
+        await createQuestion([payload] as CreateQuestionBody[])
+      }
 
-      const newErrors = { ...errors }
-      delete newErrors[questionId]
-      setErrors(newErrors)
+      setRefresh()
+      setQuestions((prev) => prev.map((q) => (q.id === question.id ? { ...q, isEditing: false } : q)))
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[question.id]
+        return newErrors
+      })
+    } catch (error) {
+      console.error('Error saving question:', error)
     }
-  }
-
-  const getQuestionDisplayData = (question) => {
-    return editingStates[question.id]?.isEditing ? editingStates[question.id] : question
   }
 
   return (
@@ -456,29 +344,20 @@ const CreateExam = ({ questions: initialQuestions, exam_id, setRefresh }: Create
         className='container flex flex-col gap-2 items-start justify-center mx-auto w-full h-[calc(100vh-200px)] py-3'
       >
         <div className='min-h-full relative'>
-          {questions.map((originalQuestion, index) => {
-            const question = getQuestionDisplayData(originalQuestion)
-            const questionErrors = errors[question.id] || {}
+          {questions.map((question, index) => (
+            <QuestionItem
+              key={question.id}
+              question={question}
+              questionNumber={index + 1}
+              onDelete={handleDelete}
+              onSave={handleSave}
+              onEdit={handleEdit}
+              onQuestionChange={handleQuestionChange}
+              errors={errors[question.id] || {}}
+            />
+          ))}
 
-            return (
-              <QuestionItem
-                key={question.id}
-                question={question}
-                originalQuestion={originalQuestion}
-                questionErrors={questionErrors}
-                questionIndex={index}
-                questionNumber={index + 1}
-                onQuestionChange={handleQuestionChange}
-                onToggleEdit={toggleEditMode}
-                onDelete={handleDeleteQuestion}
-                onValidationErrors={handleValidationErrors}
-                setRefresh={setRefresh}
-                exam_id={exam_id}
-              />
-            )
-          })}
-
-          <div className='sticky bottom-0 w-full bg-white py-4' ref={addButtonRef}>
+          <div className='sticky bottom-0 w-full bg-white py-4'>
             <div className='w-full flex justify-center gap-4'>
               <Button onClick={handleAddQuestion} className='gap-2 border border-gray-500' size='lg' variant='outline'>
                 <Plus className='w-4 h-4' />
