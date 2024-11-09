@@ -52,20 +52,22 @@ const ExamCard: React.FC<ExamCardProps> = ({ exam, onDeleteExam }) => {
       </CardHeader>
 
       {/* Card Footer */}
-      <CardFooter className='mt-32 px-3 w-full flex items-center justify-between'>
+      <CardFooter className='mt-32 px-3 w-full flex items-center justify-center gap-2'>
         <Link to={`/quiz/${exam.examId}`} className='w-4/5'>
           <Button className='w-full bg-violet-950 hover:bg-violet-800 text-white font-semibold transition-all duration-200'>
             View detail
           </Button>
         </Link>
-        <button
-          className='w-1/5 cursor-pointer text-muted-foreground hover:text-red-600 bg-white rounded-sm flex items-center justify-center transition-all duration-200'
-          aria-label='Delete Exam'
-          title='Delete Exam'
-          onClick={() => onDeleteExam(exam.examId)}
-        >
-          <Trash className='text-violet-950 hover:text-violet-800' />
-        </button>
+        {!exam.isActive && (
+          <button
+            className='w-1/5 cursor-pointer text-muted-foreground hover:text-red-600 bg-white rounded-sm flex items-center justify-center transition-all duration-200'
+            aria-label='Delete Exam'
+            title='Delete Exam'
+            onClick={() => onDeleteExam(exam.examId)}
+          >
+            <Trash className='text-violet-950 hover:text-violet-800' />
+          </button>
+        )}
       </CardFooter>
     </Card>
   )
