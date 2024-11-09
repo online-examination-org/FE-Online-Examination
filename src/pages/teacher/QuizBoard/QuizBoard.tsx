@@ -63,6 +63,7 @@ const QuizBoard: React.FC = () => {
 
   useEffect(() => {
     if (id) {
+      fetchExam()
       fetchQuestions()
     }
   }, [id, refresh])
@@ -88,7 +89,7 @@ const QuizBoard: React.FC = () => {
           </TabsList>
 
           <TabsContent value='general'>
-            <ExamDetails exam={exam} />
+            <ExamDetails exam={exam} setRefesh={() => setRefesh((prev) => !prev)} />
           </TabsContent>
           <TabsContent value='result'>
             <StudentRecordTable results={results} />

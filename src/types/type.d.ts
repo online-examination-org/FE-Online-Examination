@@ -34,17 +34,17 @@ interface Teacher {
 }
 
 export interface Exam {
-  createdAt: string
-  updatedAt: string
-  examId: number
-  title: string
-  passcode: string
-  startTime: string
-  endTime: string
-  duration: number
-  description: string
-  teacher: Teacher
-  isActive: boolean
+  createdAt?: string
+  updatedAt?: string
+  examId?: number
+  title?: string
+  passcode?: string
+  startTime?: string
+  endTime?: string
+  duration?: number
+  description?: string
+  teacher?: Teacher
+  isActive?: boolean
 }
 
 export interface ExamResult {
@@ -115,4 +115,13 @@ interface StartQuizProps {
 interface saveQuizProps {
   question_id: number
   response: string
+}
+
+interface UpdateExamProps {
+  title?: string
+  startTime?: string
+  endTime?: string
+  duration?: number
+  description?: string
+  isActive?: boolean
 }
