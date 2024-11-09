@@ -18,3 +18,10 @@ export const getProfile = () => {
 export const getExams = () => {
   return http.get<Exam[]>(`${baseUrl}/exams`)
 }
+
+export const getExamResultDetail = (examResultId: number) => {
+  const params = new URLSearchParams({
+    examResultId: examResultId.toString()
+  })
+  return http.get(`${baseUrl}/result/detail?${params.toString()}`)
+}

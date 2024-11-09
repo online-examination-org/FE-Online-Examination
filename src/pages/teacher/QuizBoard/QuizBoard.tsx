@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { DocumentIcon } from '@/assets/logo'
 import { useParams } from 'react-router-dom'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -31,6 +32,7 @@ const QuizBoard: React.FC = () => {
   const fetchResults = async () => {
     try {
       const response = await getExamResults(id as string)
+      console.log(response.data)
       setResults(response.data || [])
     } catch (err) {
       console.log(err)
@@ -91,7 +93,7 @@ const QuizBoard: React.FC = () => {
             <ExamDetails exam={exam} />
           </TabsContent>
           <TabsContent value='result'>
-            <StudentRecordTable results={results} />
+            <StudentRecordTable results={results} examId={id} />
           </TabsContent>
           <TabsContent value='question'>
             <CreateExam questions={questions} setRefresh={() => setRefesh(!refresh)} exam_id={id as string} />
