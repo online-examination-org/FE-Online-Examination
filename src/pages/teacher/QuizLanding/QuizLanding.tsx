@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useState, useEffect } from 'react'
 import { CreateExamBody, Exam } from '@/types/type'
 import { getExams } from '@/services/teachers.services'
@@ -20,16 +21,14 @@ function QuizLanding() {
   const [searchTerm, setSearchTerm] = useState('')
   const [startDateFilter, setStartDateFilter] = useState('')
   const [endDateFilter, setEndDateFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
   const [examsDisplay, setExamsDisplay] = useState<Exam[]>([])
-  //const [exams, setExams] = useState<Exam[]>([])
   const [loading, setLoading] = useState(true)
   const [refresh, setRefresh] = useState(true)
 
   const { toast } = useToast()
-
   const { exams, setExams } = useExams()
 
-  // Hàm chuyển đổi giờ UTC sang UTC+7
   const convertToVietnamTime = (date: Date) => {
     return new Date(date.getTime() + 7 * 60 * 60 * 1000)
   }
@@ -56,7 +55,6 @@ function QuizLanding() {
     }
   }
 
-  // Hàm chuyển đổi từ chuỗi datetime-local sang Date với múi giờ Việt Nam
   const parseLocalDateTime = (dateTimeStr: string) => {
     if (!dateTimeStr) return null
     const date = new Date(dateTimeStr)
@@ -132,8 +130,15 @@ function QuizLanding() {
       })
     }
 
+    // Status filter
+    if (statusFilter !== 'all') {
+      filteredExams = filteredExams.filter((exam) => {
+        return statusFilter === 'active' ? exam.isActive : !exam.isActive
+      })
+    }
+
     setExamsDisplay(filteredExams)
-  }, [searchTerm, startDateFilter, endDateFilter, exams])
+  }, [searchTerm, startDateFilter, endDateFilter, statusFilter, exams])
 
   const ExamCardSkeleton = () => (
     <Card className='min-h-[271px] relative overflow-hidden'>
@@ -183,6 +188,16 @@ function QuizLanding() {
                 className='w-48 block'
               />
             </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className='w-[180px]'>
+                <SelectValue placeholder='Filter by status' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='all'>All</SelectItem>
+                <SelectItem value='active'>Active</SelectItem>
+                <SelectItem value='inactive'>Inactive</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -328,8 +343,7 @@ function QuizLanding() {
             </Dialog>
 
             {loading
-              ? // Show 8 skeleton cards while loading
-                [...Array(8)].map((_, index) => <ExamCardSkeleton key={index} />)
+              ? [...Array(8)].map((_, index) => <ExamCardSkeleton key={index} />)
               : examsDisplay.map((exam) => <ExamCard key={exam.examId} exam={exam} onDeleteExam={onDeleteExam} />)}
           </div>
         </ScrollArea>
